@@ -1,10 +1,10 @@
-name: Java CI with Gradle
+name: Server Build with Gradle
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   build:
@@ -18,4 +18,5 @@ jobs:
         distribution: temurin
         java-version: 17
         cache: gradle
-    - run: ./gradlew build --no-daemon --stacktrace
+    - name: Build Server
+      run: ./gradlew build --no-daemon --stacktrace

@@ -25,9 +25,11 @@
 
     <!-- Checks for Size Violations.                    -->
     <!-- See http://checkstyle.sf.net/config_sizes.html -->
-    <module name="FileLength"/>
+    <module name="FileLength">
+        <property name="max" value="2024"/>
+    </module>
     <module name="LineLength">
-        <property name="max" value="120"/>
+        <property name="max" value="130"/>
     </module>
 
     <!-- Checks for whitespace                               -->

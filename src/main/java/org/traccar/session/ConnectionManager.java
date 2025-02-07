@@ -44,7 +44,14 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -69,7 +76,7 @@ public class ConnectionManager implements BroadcastInterface {
     private final Map<ConnectionKey, Map<String, DeviceSession>> sessionsByEndpoint = new ConcurrentHashMap<>();
     private final Map<ConnectionKey, String> unknownByEndpoint = new ConcurrentHashMap<>();
 
-    private final Config config;
+    private Config config;
     private final CacheManager cacheManager;
     private final Storage storage;
     private final NotificationManager notificationManager;
@@ -82,6 +89,22 @@ public class ConnectionManager implements BroadcastInterface {
     private final Map<Long, Set<Long>> deviceUsers = new HashMap<>();
 
     private final Map<Long, Timeout> timeouts = new ConcurrentHashMap<>();
+
+    public Config getConfig() {
+        return config;
+    }
+
+    @Inject
+    public void setConfig(Config config) {
+        this.config = config;
+        init();
+    }
+
+    /**
+     * Method called when config is initialized.
+     */
+    protected void init() {
+    }
 
     @Inject
     public ConnectionManager(
@@ -268,9 +291,51 @@ public class ConnectionManager implements BroadcastInterface {
             }, deviceTimeout, TimeUnit.SECONDS));
         }
 
+        Date lmt = device.getLiveModetime();
+        String formattedDate = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss").format(lmt);
+        if (formattedDate.indexOf("2000-01-01 01:01:01") == -1) {
+            Date now = new Date();
+            long diff = now.getTime() - lmt.getTime();
+            long diffSeconds = diff / 1000;
+            if (diffSeconds > 300) {
+                    StringBuilder s = new StringBuilder();
+                    s.append("LiveMode deactivation command triggerd on uniqueID: ").append(device.getUniqueId());
+                    s.append(" started at ").append(lmt).append(" ended at ").append(now);
+                    s.append(" after: ").append(diffSeconds).append(" seconds");
+                    LOGGER.info(s.toString());
+
+                    String jsonData = "{\"id\": 24, \"deviceId\": ".concat(String.valueOf(device.getId()));
+                    jsonData = jsonData.concat(", \"type\": \"liveModeOff\", \"description\": \"LiveModeOff\"}");
+
+                    String apiusername = getConfig().getString(Keys.LIVEMODE_USERNAME);
+                    String apipassword = getConfig().getString(Keys.LIVEMODE_PASSWORD);
+
+                    String auth = apiusername + ":" + apipassword;
+                    String encodedAuth = Base64.getEncoder().encodeToString(auth.getBytes(StandardCharsets.UTF_8));
+                    String authHeader = "Basic " + encodedAuth;
+
+                    HttpClient httpClient = HttpClient.newHttpClient();
+                    URI uri = URI.create("https://track.gps4pets.de/api/commands/send");
+                    HttpRequest request = HttpRequest.newBuilder()
+                        .uri(uri)
+                        .header("Content-Type", "application/json")
+                        .header("Authorization", authHeader)
+                        .POST(HttpRequest.BodyPublishers.ofString(jsonData))
+                        .build();
+
+                    try {
+                        HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+
+                        LOGGER.info("LiveMode Deactivation command status: " + (response.statusCode() == 200 ? "ok" : "failed"));
+                    } catch (Exception e) {
+                        LOGGER.warn("LiveMode Deactivation command failed");
+                    }
+            }
+        }
+
         try {
             storage.updateObject(device, new Request(
-                    new Columns.Include("status", "lastUpdate"),
+                    new Columns.Include("status", "lastUpdate", "liveModetime", "lighttime", "soundtime"),
                     new Condition.Equals("id", deviceId)));
         } catch (StorageException e) {
             LOGGER.warn("Update device status error", e);

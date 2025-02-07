@@ -23,6 +23,20 @@ public final class Keys {
     }
 
     /**
+     * Username (eMail) of admin user for triggering livemode activationd and deactivation
+     */
+    public static final ConfigKey<String> LIVEMODE_USERNAME = new StringConfigKey(
+            "livemode.username",
+            List.of(KeyType.CONFIG));
+
+    /**
+     * Password of admin user for triggering livemode activationd and deactivation
+     */
+    public static final ConfigKey<String> LIVEMODE_PASSWORD = new StringConfigKey(
+            "livemode.password",
+            List.of(KeyType.CONFIG));
+
+    /**
      * Network interface for the protocol. If not specified, server will bind all interfaces.
      */
     public static final ConfigSuffix<String> PROTOCOL_ADDRESS = new StringConfigSuffix(
@@ -1950,7 +1964,7 @@ public final class Keys {
     public static final ConfigKey<String> LOGGER_ATTRIBUTES = new StringConfigKey(
             "logger.attributes",
             List.of(KeyType.CONFIG),
-            "time,position,speed,course,accuracy,result");
+            "time,position,speed,course,accuracy,result,batteryLevel");
 
     /**
      * Broadcast method. Available options are "multicast" and "redis". By default, (if the value is not

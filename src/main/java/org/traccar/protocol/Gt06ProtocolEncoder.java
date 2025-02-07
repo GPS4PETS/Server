@@ -94,6 +94,24 @@ public class Gt06ProtocolEncoder extends BaseProtocolEncoder {
                 }
             case Command.TYPE_CUSTOM:
                 return encodeContent(command.getDeviceId(), command.getString(Command.KEY_DATA));
+            case Command.TYPE_POSITION_PERIODIC:
+                return encodeContent(command.getDeviceId(), "TIMER," + command.getString(Command.KEY_FREQUENCY) + "#");
+            case Command.TYPE_HEARTBEAT:
+                return encodeContent(command.getDeviceId(), "HBT," + command.getString(Command.KEY_FREQUENCY) + "#");
+            case Command.TYPE_STATIC:
+                return encodeContent(command.getDeviceId(), "STATIC," + command.getString(Command.KEY_FREQUENCY) + "#");
+            case Command.TYPE_LIGHT_ON:
+                return encodeContent(command.getDeviceId(), "LPT,ON,1#");
+            case Command.TYPE_LIGHT_OFF:
+                return encodeContent(command.getDeviceId(), "LPT,OFF,1#");
+            case Command.TYPE_BUZZER_ON:
+                return encodeContent(command.getDeviceId(), "SPT,ON,1#");
+            case Command.TYPE_BUZZER_OFF:
+                return encodeContent(command.getDeviceId(), "SPT,OFF,1#");
+            case Command.TYPE_LIVEMODE_ON:
+                return encodeContent(command.getDeviceId(), "TIMER,2#");
+            case Command.TYPE_LIVEMODE_OFF:
+                return encodeContent(command.getDeviceId(), "TIMER,60#");
             default:
                 return null;
         }

@@ -9,4 +9,7 @@
     <entry key='database.user'>sa</entry>
     <entry key='database.password'></entry>
 
+    <entry key='livemode.username'>email</entry>
+    <entry key="livemode.password'>password</entry>
+
 </properties>

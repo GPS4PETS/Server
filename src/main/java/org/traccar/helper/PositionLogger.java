@@ -80,6 +80,9 @@ public class PositionLogger {
                         builder.append(", invalid");
                     }
                     break;
+                case "batteryLevel":
+                    builder.append(", batteryLevel: ").append(position.getAttributes().get(Position.KEY_BATTERY_LEVEL));
+                    break;
                 default:
                     Object value = position.getAttributes().get(attribute);
                     if (value != null) {

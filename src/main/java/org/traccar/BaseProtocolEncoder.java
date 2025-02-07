@@ -29,9 +29,12 @@ import org.traccar.session.cache.CacheManager;
 
 import jakarta.inject.Inject;
 
+import java.util.Calendar;
+import java.util.Date;
+
 public abstract class BaseProtocolEncoder extends ChannelOutboundHandlerAdapter {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BaseProtocolEncoder.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(BaseProtocolEncoder.class);
 
     private static final String PROTOCOL_UNKNOWN = "unknown";
 
@@ -98,6 +101,76 @@ public abstract class BaseProtocolEncoder extends ChannelOutboundHandlerAdapter 
                 }
                 LOGGER.info(s.toString());
 
+                if (command.getType().contains(Command.TYPE_LIVEMODE_OFF)) {
+                    long deviceId = command.getDeviceId();
+                    Device device = cacheManager.getObject(Device.class, deviceId);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(Calendar.YEAR, 2000);
+                    calendar.set(Calendar.MONTH, Calendar.JANUARY);
+                    calendar.set(Calendar.DAY_OF_MONTH, 1);
+                    calendar.set(Calendar.HOUR_OF_DAY, 1);
+                    calendar.set(Calendar.MINUTE, 1);
+                    calendar.set(Calendar.SECOND, 1);
+                    Date deactdate = calendar.getTime();
+                    device.setLiveModetime(deactdate);
+                    s = new StringBuilder();
+                    s.append("LiveMode deactivated on uniqueID: ").append(device.getUniqueId());
+                    LOGGER.info(s.toString());
+                } else if (command.getType().contains(Command.TYPE_LIVEMODE_ON)) {
+                    long deviceId = command.getDeviceId();
+                    Device device = cacheManager.getObject(Device.class, deviceId);
+                    device.setLiveModetime(new Date());
+                    s = new StringBuilder();
+                    s.append("LiveMode activated on uniqueID: ").append(device.getUniqueId());
+                    s.append(", Time: ").append(device.getLiveModetime().toString());
+                    LOGGER.info(s.toString());
+                } else if (command.getType().contains(Command.TYPE_LIGHT_ON)) {
+                    long deviceId = command.getDeviceId();
+                    Device device = cacheManager.getObject(Device.class, deviceId);
+                    device.setLighttime(new Date());
+                    s = new StringBuilder();
+                    s.append("Light activated on uniqueID: ").append(device.getUniqueId());
+                    s.append(", Time: ").append(device.getLighttime().toString());
+                    LOGGER.info(s.toString());
+                }  else if (command.getType().contains(Command.TYPE_BUZZER_ON)) {
+                    long deviceId = command.getDeviceId();
+                    Device device = cacheManager.getObject(Device.class, deviceId);
+                    device.setSoundtime(new Date());
+                    s = new StringBuilder();
+                    s.append("Sound activated on uniqueID: ").append(device.getUniqueId());
+                    s.append(", Time: ").append(device.getSoundtime().toString());
+                    LOGGER.info(s.toString());
+                } else if (command.getType().contains(Command.TYPE_LIGHT_OFF)) {
+                    long deviceId = command.getDeviceId();
+                    Device device = cacheManager.getObject(Device.class, deviceId);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(Calendar.YEAR, 2000);
+                    calendar.set(Calendar.MONTH, Calendar.JANUARY);
+                    calendar.set(Calendar.DAY_OF_MONTH, 1);
+                    calendar.set(Calendar.HOUR_OF_DAY, 1);
+                    calendar.set(Calendar.MINUTE, 1);
+                    calendar.set(Calendar.SECOND, 1);
+                    Date deactdate = calendar.getTime();
+                    device.setLighttime(deactdate);
+                    s = new StringBuilder();
+                    s.append("Light deactivated on uniqueID: ").append(device.getUniqueId());
+                    LOGGER.info(s.toString());
+                } else if (command.getType().contains(Command.TYPE_LIGHT_OFF)) {
+                    long deviceId = command.getDeviceId();
+                    Device device = cacheManager.getObject(Device.class, deviceId);
+                    Calendar calendar = Calendar.getInstance();
+                    calendar.set(Calendar.YEAR, 2000);
+                    calendar.set(Calendar.MONTH, Calendar.JANUARY);
+                    calendar.set(Calendar.DAY_OF_MONTH, 1);
+                    calendar.set(Calendar.HOUR_OF_DAY, 1);
+                    calendar.set(Calendar.MINUTE, 1);
+                    calendar.set(Calendar.SECOND, 1);
+                    Date deactdate = calendar.getTime();
+                    device.setSoundtime(deactdate);
+                    s = new StringBuilder();
+                    s.append("Sound deactivated on uniqueID: ").append(device.getUniqueId());
+                    LOGGER.info(s.toString());
+                }
                 ctx.write(new NetworkMessage(encodedCommand, networkMessage.getRemoteAddress()), promise);
 
                 return;

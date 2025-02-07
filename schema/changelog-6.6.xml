@@ -12,6 +12,18 @@
       <column name="description" type="VARCHAR(4000)" />
     </addColumn>
 
+    <addColumn tableName="tc_devices">
+      <column name="livemodetime" type="TIMESTAMP" />
+    </addColumn>
+
+     <addColumn tableName="tc_devices">
+      <column name="lighttime" type="TIMESTAMP" />
+    </addColumn>
+
+     <addColumn tableName="tc_devices">
+      <column name="soundtime" type="TIMESTAMP" />
+    </addColumn>
+
   </changeSet>
 
 </databaseChangeLog>

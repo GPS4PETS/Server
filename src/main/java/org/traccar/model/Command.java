@@ -27,7 +27,9 @@ public class Command extends BaseCommand {
     public static final String TYPE_CUSTOM = "custom";
     public static final String TYPE_IDENTIFICATION = "deviceIdentification";
     public static final String TYPE_POSITION_SINGLE = "positionSingle";
+    public static final String TYPE_POSITION_PERIODIC_ORIG = "positionPeriodicOrig";
     public static final String TYPE_POSITION_PERIODIC = "positionPeriodic";
+    public static final String TYPE_POSITION_PERIODIC_STATIC = "positionPeriodicStatic";
     public static final String TYPE_POSITION_STOP = "positionStop";
     public static final String TYPE_ENGINE_STOP = "engineStop";
     public static final String TYPE_ENGINE_RESUME = "engineResume";
@@ -60,6 +62,8 @@ public class Command extends BaseCommand {
     public static final String TYPE_SET_SPEED_LIMIT = "setSpeedLimit";
     public static final String TYPE_MODE_POWER_SAVING = "modePowerSaving";
     public static final String TYPE_MODE_DEEP_SLEEP = "modeDeepSleep";
+    public static final String TYPE_TRANSPARENT = "transparent";
+    public static final String TYPE_TRANSPARENT_SER = "transparentSer";
 
     public static final String TYPE_ALARM_GEOFENCE = "alarmGeofence";
     public static final String TYPE_ALARM_BATTERY = "alarmBattery";
@@ -69,6 +73,20 @@ public class Command extends BaseCommand {
     public static final String TYPE_ALARM_SPEED = "alarmSpeed";
     public static final String TYPE_ALARM_FALL = "alarmFall";
     public static final String TYPE_ALARM_VIBRATION = "alarmVibration";
+
+    public static final String TYPE_LIGHT_ON = "lightOn";
+    public static final String TYPE_LIGHT_OFF = "lightOff";
+    public static final String TYPE_LIGHT_DURATION = "lightDuration";
+    public static final String TYPE_BUZZER_ON = "buzzerOn";
+    public static final String TYPE_BUZZER_OFF = "buzzerOff";
+    public static final String TYPE_BUZZER_DURATION = "buzzerDuration";
+    public static final String TYPE_STATUS_LED = "statusLed";
+    public static final String TYPE_HEARTBEAT = "heartbeat";
+    public static final String TYPE_STATIC = "static";
+    public static final String TYPE_TK_WORKMODE = "tkWorkMode";
+    public static final String TYPE_LIVEMODE_ON = "liveModeOn";
+    public static final String TYPE_LIVEMODE_OFF = "liveModeOff";
+    public static final String TYPE_SET_APN = "setApn";
 
     public static final String KEY_UNIQUE_ID = "uniqueId";
     public static final String KEY_FREQUENCY = "frequency";
@@ -83,6 +101,8 @@ public class Command extends BaseCommand {
     public static final String KEY_PHONE = "phone";
     public static final String KEY_SERVER = "server";
     public static final String KEY_PORT = "port";
+    public static final String KEY_DURATION = "duration";
+    public static final String KEY_TK_WORKMODE = "tkWorkMode";
 
     @QueryIgnore
     @Override

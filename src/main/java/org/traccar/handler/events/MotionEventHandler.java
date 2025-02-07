@@ -39,7 +39,9 @@ public class MotionEventHandler extends BaseEventHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(MotionEventHandler.class);
 
     private final CacheManager cacheManager;
-    private final Storage storage;
+    private Storage storage;
+
+    //private CommandsManager commandsManager;
 
     @Inject
     public MotionEventHandler(CacheManager cacheManager, Storage storage) {
@@ -66,10 +68,11 @@ public class MotionEventHandler extends BaseEventHandler {
         MotionProcessor.updateState(state, position, position.getBoolean(Position.KEY_MOTION), tripsConfig);
         if (state.isChanged()) {
             state.toDevice(device);
+
             try {
                 storage.updateObject(device, new Request(
-                        new Columns.Include("motionStreak", "motionState", "motionTime", "motionDistance"),
-                        new Condition.Equals("id", device.getId())));
+                    new Columns.Include("motionStreak", "motionState", "motionTime", "motionDistance"),
+                    new Condition.Equals("id", device.getId())));
             } catch (StorageException e) {
                 LOGGER.warn("Update device motion error", e);
             }

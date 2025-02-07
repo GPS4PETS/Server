@@ -260,6 +260,16 @@ public class WatchProtocolDecoder extends BaseProtocolDecoder {
                     position.set(Position.KEY_STEPS, Integer.parseInt(values[0]));
 
                     return position;
+                } else if (values.length >= 2) {
+                    Position position = new Position(getProtocolName());
+                    position.setDeviceId(deviceSession.getDeviceId());
+
+                    getLastLocation(position, null);
+
+                    position.set(Position.KEY_BATTERY_LEVEL, Integer.parseInt(values[1]));
+                    position.set(Position.KEY_STEPS, Integer.parseInt(values[0]));
+
+                    return position;
                 }
             }
 

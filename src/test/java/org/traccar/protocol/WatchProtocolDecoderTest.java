@@ -112,7 +112,7 @@ public class WatchProtocolDecoderTest extends ProtocolTest {
         verifyPosition(decoder, buffer(
                 "[3G*4700222306*011F*UD2,120316,140444,A,48.779045,N, 9.1574736,E,0.57,12.8,0.0,7,28,77,0,0,00000000,2,2,262,1,21041,9067,121,21041,5981,116,5,WG-Superlativ,34:31:c4:c8:a9:22,-67,EasyBox-28E858,18:83:bf:28:e8:f4,-70,MoMaXXg,be:05:43:b7:19:15,-72,MoMaXX2,bc:05:43:b7:19:15,-72,Gastzugang,18:83:bf:28:e8:f5,-72]"));
 
-        verifyNull(decoder, buffer(
+        verifyAttributes(decoder, buffer(
                 "[SG*9081000548*0009*LK,0,100]"));
 
         verifyPosition(decoder, buffer(

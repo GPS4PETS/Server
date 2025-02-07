@@ -20,7 +20,28 @@ import org.slf4j.LoggerFactory;
 import org.traccar.model.Event;
 import org.traccar.model.Position;
 
+import org.traccar.config.Config;
+import jakarta.inject.Inject;
+
 public abstract class BaseEventHandler {
+
+    private Config config;
+
+    public Config getConfig() {
+        return config;
+    }
+
+    @Inject
+    public void setConfig(Config config) {
+        this.config = config;
+        init();
+    }
+
+    /**
+     * Method called when config is initialized.
+     */
+    protected void init() {
+    }
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseEventHandler.class);
 

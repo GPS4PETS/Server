@@ -1770,6 +1770,10 @@ components:
         attributes:
           type: object
           properties: {}
+        lightswitch:
+          type: boolean
+        soundswitch:
+          type: boolean
     User:
       type: object
       properties:

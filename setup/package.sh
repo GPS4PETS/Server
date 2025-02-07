@@ -109,7 +109,7 @@ package_other () {
   info "Building Zip archive"
   cp README.txt out
   cd out
-  zip -q -r ../traccar-other-$VERSION.zip *
+  zip -q -r ../gps4pets-other-$VERSION.zip *
   cd ..
   rm out/README.txt
   ok "Created Zip archive"
@@ -122,7 +122,7 @@ package_windows () {
   rm -rf jdk-*
   wine app/ISCC.exe traccar.iss >/dev/null
   rm -rf out/jre
-  zip -q -j traccar-windows-64-$VERSION.zip Output/traccar-setup.exe README.txt
+  zip -q -j gps4pets-windows-64-$VERSION.zip Output/traccar-setup.exe README.txt
   rm -r Output
   ok "Created Windows 64 installer"
 }
@@ -137,7 +137,7 @@ package_linux () {
   makeself --needroot --quiet --notemp out traccar.run "traccar" ./setup.sh
   rm -rf out/jre
 
-  zip -q -j traccar-linux-$1-$VERSION.zip traccar.run README.txt
+  zip -q -j gps4pets-linux-$1-$VERSION.zip traccar.run README.txt
 
   rm traccar.run
   rm out/setup.sh
@@ -162,7 +162,6 @@ case $PLATFORM in
   all)
 	package_linux_64
 	package_linux_arm
-	package_windows
 	package_other
 	;;
 

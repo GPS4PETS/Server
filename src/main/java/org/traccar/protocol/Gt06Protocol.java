@@ -30,7 +30,16 @@ public class Gt06Protocol extends BaseProtocol {
         setSupportedDataCommands(
                 Command.TYPE_ENGINE_STOP,
                 Command.TYPE_ENGINE_RESUME,
-                Command.TYPE_CUSTOM);
+                Command.TYPE_POSITION_PERIODIC,
+                Command.TYPE_HEARTBEAT,
+                Command.TYPE_LIGHT_ON,
+                Command.TYPE_LIGHT_OFF,
+                Command.TYPE_BUZZER_ON,
+                Command.TYPE_BUZZER_OFF,
+                Command.TYPE_STATIC,
+                Command.TYPE_CUSTOM,
+                Command.TYPE_LIVEMODE_ON,
+                Command.TYPE_LIVEMODE_OFF);
         addServer(new TrackerServer(config, getName(), false) {
             @Override
             protected void addProtocolHandlers(PipelineBuilder pipeline, Config config) {
