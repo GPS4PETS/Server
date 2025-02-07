@@ -864,7 +864,7 @@ public final class Keys {
     public static final ConfigKey<String> WEB_CACHE_CONTROL = new StringConfigKey(
             "web.cacheControl",
             List.of(KeyType.CONFIG),
-            "max-age=3600,public");
+            "max-age=180,public");
 
     /**
      * Enable TOTP authentication on the server.
