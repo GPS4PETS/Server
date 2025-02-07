@@ -7,9 +7,9 @@ Traccar is an open source GPS tracking system. This repository contains Java-bas
 
 Other parts of GPS4PETS solution include:
 
-- [GPS4PET web app](https://github.com/pvtex/traccar-web)
-- [GPS4PETS Android app](https://github.com/pvtex/gps4pets-android)
-- [GPS4PETS iOS app](https://github.com/pvtex/gps4pets-ios)
+- [GPS4PETS web app](https://github.com/GPS4PETS/Server-web)
+- [GPS4PETS Android app](https://github.com/GPS4PETS/Android-APP)
+- [GPS4PETS iOS app](https://github.com/GPS4PETS/iOS-APP)
 
 ## Features
 
