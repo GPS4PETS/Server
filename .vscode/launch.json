@@ -1,0 +1,42 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Server run",
+            "request": "launch",
+            "mainClass": "org.traccar.Main",
+            "projectName": "tracker-server-traccar"
+        },
+        {
+            "name": "Server build",
+            "request": "launch",
+            "runtimeExecutable": "./make",
+            "type": "node"
+        },
+        {
+            "name": "Web build",
+            "cwd": "${workspaceFolder}\\traccar-web",
+            "request": "launch",
+            "runtimeExecutable": "./make",
+            "type": "node"
+        },
+        {
+            "name": "Web copy",
+            "cwd": "${workspaceFolder}\\traccar-web",
+            "request": "launch",
+            "runtimeExecutable": "./copy",
+            "type": "node"
+        },
+        {
+            "name": "Server copy",
+            "request": "launch",
+            "runtimeExecutable": "./copy",
+            "type": "node"
+        },
+    ]
+
+}
