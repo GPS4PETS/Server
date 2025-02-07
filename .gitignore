@@ -13,16 +13,4 @@ build
 bin
 setup/OpenJDK*
 setup/innosetup*
-traccar-web/node_modules
-traccar-web/coverage
-traccar-web/build
-traccar-web/.DS_Store
-traccar-web/.env.local
-traccar-web/.env.development.local
-traccar-web/.env.test.local
-traccar-web/.env.production.local
-traccar-web/npm-debug.log*
-traccar-web/yarn-debug.log*
-traccar-web/yarn-error.log*
-traccar-web/legacy/web/lib
-traccar-web/legacy/web/app.min.js
+traccar-web/
