@@ -1,3 +1,6 @@
 {
-    "java.compile.nullAnalysis.mode": "automatic"
+    "java.compile.nullAnalysis.mode": "disabled",
+    "editor.showDeprecated": false,
+    "editor.suggest.showDeprecated": false,
+    "java.server.launchMode": "LightWeight"
 }
