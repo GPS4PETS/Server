@@ -267,6 +267,32 @@ public class Gt06ProtocolDecoder extends BaseProtocolDecoder {
         }
     }
 
+    private void sendCommand(Channel channel, String content) {
+        if (channel != null) {
+            ByteBuf buf = Unpooled.buffer();
+
+            buf.writeByte(0x78);
+            buf.writeByte(0x78);
+
+            buf.writeByte(1 + 1 + 4 + content.length() + 2 + 2); // message length
+
+            buf.writeByte(Gt06ProtocolDecoder.MSG_COMMAND_0);
+
+            buf.writeByte(4 + content.length()); // command length
+            buf.writeInt(0);
+            buf.writeBytes(content.getBytes(StandardCharsets.US_ASCII)); // command
+
+            buf.writeShort(0); // message index
+
+            buf.writeShort(Checksum.crc16(Checksum.CRC16_X25, buf.nioBuffer(2, buf.writerIndex() - 2)));
+
+            buf.writeByte('\r');
+            buf.writeByte('\n');
+
+            channel.writeAndFlush(new NetworkMessage(buf, channel.remoteAddress()));
+        }
+    }
+
     private void sendPhotoRequest(Channel channel, int pictureId) {
         ByteBuf photo = photos.get(pictureId);
         ByteBuf content = Unpooled.buffer();
@@ -513,6 +539,8 @@ public class Gt06ProtocolDecoder extends BaseProtocolDecoder {
             }
 
             sendResponse(channel, false, type, buf.getShort(buf.writerIndex() - 6), null);
+            sendCommand(channel, "LPT#");
+            sendCommand(channel, "SPT#");
 
             return position;
 
@@ -735,6 +763,18 @@ public class Gt06ProtocolDecoder extends BaseProtocolDecoder {
                 String data = buf.readSlice(commandLength - 4).toString(StandardCharsets.US_ASCII);
                 if (data.startsWith("<ICCID:")) {
                     position.set(Position.KEY_ICCID, data.substring(7, 27));
+                } else if (data.indexOf("LPT:ON") > -1) {
+                    position.set(Position.KEY_LIGHTSWITCH, 1);
+                    position.set(Position.KEY_RESULT, data);
+                } else if (data.indexOf("LPT:OFF") > -1) {
+                    position.set(Position.KEY_LIGHTSWITCH, 0);
+                    position.set(Position.KEY_RESULT, data);
+                } else if (data.indexOf("SPT:ON") > -1) {
+                    position.set(Position.KEY_SOUNDSWITCH, 1);
+                    position.set(Position.KEY_RESULT, data);
+                } else if (data.indexOf("SPT:OFF") > -1) {
+                    position.set(Position.KEY_SOUNDSWITCH, 0);
+                    position.set(Position.KEY_RESULT, data);
                 } else {
                     position.set(Position.KEY_RESULT, data);
                 }
