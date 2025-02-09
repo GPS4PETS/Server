@@ -352,5 +352,4 @@ public class Position extends Message {
     public void setType(String type) {
         super.setType(type);
     }
-
 }

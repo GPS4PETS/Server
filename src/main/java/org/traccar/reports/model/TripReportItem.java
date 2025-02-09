@@ -127,4 +127,14 @@ public class TripReportItem extends BaseReportItem {
     public void setDriverName(String driverName) {
         this.driverName = driverName;
     }
+
+    private Double steps;
+
+    public Double getSteps() {
+        return steps;
+    }
+
+    public void setSteps(Double steps) {
+        this.steps = steps;
+    }
 }

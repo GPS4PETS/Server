@@ -171,6 +171,11 @@ public class ReportUtils {
         trip.setDeviceId(deviceId);
         trip.setDeviceName(device.getName());
 
+        /* if (startTrip.hasAttribute("steps")) { */
+            Double steps = endTrip.getDouble(Position.KEY_STEPS) - startTrip.getDouble(Position.KEY_STEPS);
+            trip.setSteps(steps);
+        /* } */
+
         trip.setStartPositionId(startTrip.getId());
         trip.setStartLat(startTrip.getLatitude());
         trip.setStartLon(startTrip.getLongitude());
