@@ -128,13 +128,13 @@ public class TripReportItem extends BaseReportItem {
         this.driverName = driverName;
     }
 
-    private Double steps;
+    private Integer steps;
 
-    public Double getSteps() {
+    public Integer getSteps() {
         return steps;
     }
 
-    public void setSteps(Double steps) {
+    public void setSteps(Integer steps) {
         this.steps = steps;
     }
 }
