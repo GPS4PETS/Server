@@ -16,12 +16,36 @@
       <column name="livemodetime" type="TIMESTAMP" />
     </addColumn>
 
-     <addColumn tableName="tc_devices">
+    <addColumn tableName="tc_devices">
       <column name="lighttime" type="TIMESTAMP" />
     </addColumn>
 
-     <addColumn tableName="tc_devices">
+    <addColumn tableName="tc_devices">
       <column name="soundtime" type="TIMESTAMP" />
+    </addColumn>
+
+    <addColumn tableName="tc_servers">
+      <column name="activitytimewanted" type="int" />
+    </addColumn>
+
+    <addColumn tableName="tc_servers">
+      <column name="sleeptimewanted" type="int" />
+    </addColumn>
+
+    <addColumn tableName="tc_servers">
+      <column name="stepswanted" type="int" />
+    </addColumn>
+
+    <addColumn tableName="tc_devices">
+      <column name="activitytimewanted" type="int" />
+    </addColumn>
+
+    <addColumn tableName="tc_devices">
+      <column name="sleeptimewanted" type="int" />
+    </addColumn>
+
+    <addColumn tableName="tc_devices">
+      <column name="stepswanted" type="int" />
     </addColumn>
 
   </changeSet>

@@ -18,12 +18,53 @@ package org.traccar.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.traccar.storage.QueryIgnore;
 import org.traccar.storage.StorageName;
+import org.traccar.model.Server;
 
 import java.util.Date;
 import java.util.Calendar;
 
 @StorageName("tc_devices")
 public class Device extends GroupedModel implements Disableable, Schedulable {
+
+    private int activityTimeWanted;
+    private Server server;
+
+    public int getActivityTimeWanted() {
+        if (activityTimeWanted == 0) {
+            activityTimeWanted = server.getActivityTimeWanted();
+        }
+        return activityTimeWanted;
+    }
+
+    public void setActivityTimeWanted(int activityTimeWanted) {
+        this.activityTimeWanted = activityTimeWanted;
+    }
+
+    private int sleepTimeWanted;
+
+    public int getSleepTimeWanted() {
+        if (sleepTimeWanted == 0) {
+            sleepTimeWanted = server.getSleepTimeWanted();
+        }
+        return sleepTimeWanted;
+    }
+
+    public void setSleepTimeWanted(int sleepTimeWanted) {
+        this.sleepTimeWanted = sleepTimeWanted;
+    }
+
+    private int stepsWanted;
+
+    public int getStepsWanted() {
+        if (stepsWanted == 0) {
+            stepsWanted = server.getStepsWanted();
+        }
+        return stepsWanted;
+    }
+
+    public void setStepsWanted(int stepsWanted) {
+        this.stepsWanted = stepsWanted;
+    }
 
     private Date livemodetime;
 
