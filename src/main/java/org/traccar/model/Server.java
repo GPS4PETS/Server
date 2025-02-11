@@ -24,6 +24,36 @@ import org.traccar.storage.StorageName;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Server extends ExtendedModel implements UserRestrictions {
 
+    private int activityTimeWanted;
+
+    public int getActivityTimeWanted() {
+        return activityTimeWanted;
+    }
+
+    public void setActivityTimeWanted(int activityTimeWanted) {
+        this.activityTimeWanted = activityTimeWanted;
+    }
+
+    private int sleepTimeWanted;
+
+    public int getSleepTimeWanted() {
+        return sleepTimeWanted;
+    }
+
+    public void setSleepTimeWanted(int sleepTimeWanted) {
+        this.sleepTimeWanted = sleepTimeWanted;
+    }
+
+    private int stepsWanted;
+
+    public int getStepsWanted() {
+        return stepsWanted;
+    }
+
+    public void setStepsWanted(int stepsWanted) {
+        this.stepsWanted = stepsWanted;
+    }
+
     private boolean registration;
 
     public boolean getRegistration() {
