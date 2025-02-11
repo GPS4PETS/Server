@@ -18,7 +18,6 @@ package org.traccar.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.traccar.storage.QueryIgnore;
 import org.traccar.storage.StorageName;
-import org.traccar.model.Server;
 
 import java.util.Date;
 import java.util.Calendar;
@@ -27,12 +26,8 @@ import java.util.Calendar;
 public class Device extends GroupedModel implements Disableable, Schedulable {
 
     private int activityTimeWanted;
-    private Server server;
 
     public int getActivityTimeWanted() {
-        if (activityTimeWanted == 0) {
-            activityTimeWanted = server.getActivityTimeWanted();
-        }
         return activityTimeWanted;
     }
 
@@ -43,9 +38,6 @@ public class Device extends GroupedModel implements Disableable, Schedulable {
     private int sleepTimeWanted;
 
     public int getSleepTimeWanted() {
-        if (sleepTimeWanted == 0) {
-            sleepTimeWanted = server.getSleepTimeWanted();
-        }
         return sleepTimeWanted;
     }
 
@@ -56,9 +48,6 @@ public class Device extends GroupedModel implements Disableable, Schedulable {
     private int stepsWanted;
 
     public int getStepsWanted() {
-        if (stepsWanted == 0) {
-            stepsWanted = server.getStepsWanted();
-        }
         return stepsWanted;
     }
 
