@@ -32,6 +32,7 @@ public class Gt06Protocol extends BaseProtocol {
                 Command.TYPE_ENGINE_RESUME,
                 Command.TYPE_POSITION_PERIODIC,
                 Command.TYPE_HEARTBEAT,
+                Command.TYPE_STATUS_LED,
                 Command.TYPE_LIGHT_ON,
                 Command.TYPE_LIGHT_OFF,
                 Command.TYPE_BUZZER_ON,
