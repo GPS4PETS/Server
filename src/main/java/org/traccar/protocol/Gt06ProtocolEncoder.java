@@ -111,9 +111,9 @@ public class Gt06ProtocolEncoder extends BaseProtocolEncoder {
             case Command.TYPE_BUZZER_OFF:
                 return encodeContent(command.getDeviceId(), "SPT,OFF#");
             case Command.TYPE_LIVEMODE_ON:
-                return encodeContent(command.getDeviceId(), "TIMER,2#");
+                return encodeContent(command.getDeviceId(), "STATIC,2#");
             case Command.TYPE_LIVEMODE_OFF:
-                return encodeContent(command.getDeviceId(), "TIMER,60#");
+                return encodeContent(command.getDeviceId(), "STATIC,60#");
             default:
                 return null;
         }
