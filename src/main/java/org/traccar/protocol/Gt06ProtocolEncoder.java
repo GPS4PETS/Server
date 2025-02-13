@@ -101,7 +101,7 @@ public class Gt06ProtocolEncoder extends BaseProtocolEncoder {
             case Command.TYPE_STATIC:
                 return encodeContent(command.getDeviceId(), "STATIC," + command.getString(Command.KEY_FREQUENCY) + "#");
             case Command.TYPE_STATUS_LED:
-                return encodeContent(command.getDeviceId(), "LEDSLEEP," 
+                return encodeContent(command.getDeviceId(), "LEDSLEEP,"
                     + (command.getString(Command.KEY_ENABLE) == "true" ? "OFF" : "ON")
                     + "#");
             case Command.TYPE_LIGHT_ON:
