@@ -59,7 +59,7 @@ public class GeocoderHandler extends BasePositionHandler {
 
                     @Override
                     public void onSuccess(String address) {
-                        String adr[] = address.split(", ");
+                        String[] adr = address.split(", ");
                         address = adr[0] + ", " + adr[1] + ", " + adr[3];
                         position.setAddress(address);
                         callback.processed(false);
