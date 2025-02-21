@@ -252,7 +252,7 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
         }
 
         if (!deviceSession.contains(DeviceSession.KEY_TIMEZONE)) {
-            deviceSession.set(DeviceSession.KEY_TIMEZONE, getTimeZone(deviceSession.getDeviceId(), "GMT+8"));
+            deviceSession.set(DeviceSession.KEY_TIMEZONE, getTimeZone(deviceSession.getDeviceId(), "GMT+1")); // GMT+8
         }
 
         if (type == MSG_TERMINAL_REGISTER) {
@@ -368,6 +368,32 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
 
             return decodeTransparent(deviceSession, buf);
 
+        } else if (type == MSG_TERMINAL_GENERAL_RESPONSE) {
+            Position position = new Position(getProtocolName());
+            position.setDeviceId(deviceSession.getDeviceId());
+
+            getLastLocation(position, null);
+
+            buf.skipBytes(4); // time
+            byte rslt;
+            rslt = buf.readByte();
+            var resultstr = "OK/CONFIRM";
+            if (rslt == 0) {
+                resultstr = "OK/CONFIRM";
+            } else if (rslt == 0x01) {
+                resultstr = "FAILED";
+            } else if (rslt == 0x02) {
+                resultstr = "MESSAGE ERROR";
+            } else if (rslt == 0x03) {
+                resultstr = "NOT SUPPORTED";
+            } else if (rslt == 0x04) {
+                resultstr = "ALERT PROCESSING CONFIRMED";
+            } else {
+                resultstr = "NOT SUPPORTED";
+            }
+            position.set(Position.KEY_RESULT, resultstr);
+
+            return position;
         }
 
         return null;
@@ -1229,8 +1255,6 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
             position.setAltitude(buf.readShort());
             position.setSpeed(UnitsConverter.knotsFromKph(buf.readUnsignedShort() * 0.1));
             position.setCourse(buf.readUnsignedShort());
-
-            // TODO more positions and g sensor data
 
             return position;
 
