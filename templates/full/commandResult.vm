@@ -1,4 +1,4 @@
-#set($subject = "$device.name: command result received")
+#set($subject = "$device.name: Befehl Ergebis empfangen")
 <!DOCTYPE html>
 <html>
 <body>
