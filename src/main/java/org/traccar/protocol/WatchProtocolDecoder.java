@@ -168,7 +168,10 @@ public class WatchProtocolDecoder extends BaseProtocolDecoder {
                 for (int i = 0; i < wifiCount; i++) {
                     index += 1; // wifi name
                     String macAddress = values[index++];
-                    String rssi = values[index++].substring(1, 3);
+                    String rssi = values[index++];
+                    if (rssi != "") {
+                        rssi = rssi.substring(1, 3);
+                    }
                     if (!macAddress.isEmpty() && !macAddress.equals("0") && !rssi.isEmpty()) {
                         network.addWifiAccessPoint(WifiAccessPoint.from(macAddress, Integer.parseInt(rssi, 16)));
                     }
