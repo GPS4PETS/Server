@@ -64,6 +64,10 @@ public class H02ProtocolEncoder extends StringProtocolEncoder {
                     yield formatCommand(time, uniqueId, "S71", "22", frequency);
                 }
             }
+            case Command.TYPE_SET_APN -> formatCommand(time, uniqueId, "S24", Command.KEY_DATA, "", "");
+            case Command.TYPE_REBOOT_DEVICE -> formatCommand(time, uniqueId, "R1");
+            case Command.TYPE_GET_VERSION -> formatCommand(time, uniqueId, "S26", "1");
+            case Command.TYPE_GET_DEVICE_STATUS -> formatCommand(time, uniqueId, "S26", "0");
             default -> null;
         };
     }
