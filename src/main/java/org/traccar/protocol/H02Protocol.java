@@ -19,7 +19,7 @@ import io.netty.handler.codec.string.StringEncoder;
 import org.traccar.BaseProtocol;
 import org.traccar.PipelineBuilder;
 import org.traccar.TrackerServer;
-import org.traccar.api.resource.CommandResource;
+// import org.traccar.api.resource.CommandResource;
 import org.traccar.config.Config;
 import org.traccar.config.Keys;
 import org.traccar.model.Command;
