@@ -19,6 +19,7 @@ import io.netty.handler.codec.string.StringEncoder;
 import org.traccar.BaseProtocol;
 import org.traccar.PipelineBuilder;
 import org.traccar.TrackerServer;
+import org.traccar.api.resource.CommandResource;
 import org.traccar.config.Config;
 import org.traccar.config.Keys;
 import org.traccar.model.Command;
@@ -35,6 +36,7 @@ public class H02Protocol extends BaseProtocol {
                 Command.TYPE_ENGINE_STOP,
                 Command.TYPE_ENGINE_RESUME,
                 Command.TYPE_POSITION_PERIODIC,
+                Command.TYPE_POSITION_SINGLE,
                 Command.TYPE_SET_APN,
                 Command.TYPE_REBOOT_DEVICE,
                 Command.TYPE_GET_VERSION,
