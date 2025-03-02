@@ -32,7 +32,11 @@ public class OpenCellIdGeolocationProvider implements GeolocationProvider {
         if (url == null) {
             url = "http://opencellid.org/cell/get";
         }
-        this.url = url + "?format=json&mcc=%d&mnc=%d&lac=%d&cellid=%d&key=" + key;
+        if (key == null) {
+            this.url = url + "?format=json&mcc=%d&mnc=%d&lac=%d&cellid=%d";
+        } else {
+            this.url = url + "?format=json&mcc=%d&mnc=%d&lac=%d&cellid=%d&key=" + key;
+        }
     }
 
     @Override
