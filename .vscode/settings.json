@@ -2,5 +2,6 @@
     "java.compile.nullAnalysis.mode": "disabled",
     "editor.showDeprecated": false,
     "editor.suggest.showDeprecated": false,
-    "java.server.launchMode": "LightWeight"
+    "java.server.launchMode": "LightWeight",
+    "search.useIgnoreFiles": false
 }
