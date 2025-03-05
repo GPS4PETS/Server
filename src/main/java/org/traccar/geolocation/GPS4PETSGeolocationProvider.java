@@ -30,7 +30,7 @@ public class GPS4PETSGeolocationProvider implements GeolocationProvider {
     public GPS4PETSGeolocationProvider(Client client, String url, String key) {
         this.client = client;
         if (url == null) {
-            url = "http://opencellid.gps4pets.de/";
+            url = "https://opencellid.gps4pets.de/";
         }
         this.url = url + "?mcc=%d&mnc=%d&lac=%d&cell_id=%d";
     }
