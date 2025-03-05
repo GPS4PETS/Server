@@ -73,6 +73,7 @@ import org.traccar.geocoder.GeocodeJsonGeocoder;
 import org.traccar.geolocation.GeolocationProvider;
 import org.traccar.geolocation.GoogleGeolocationProvider;
 import org.traccar.geolocation.OpenCellIdGeolocationProvider;
+import org.traccar.geolocation.GPS4PETSGeolocationProvider;
 import org.traccar.geolocation.UnwiredGeolocationProvider;
 import org.traccar.handler.CopyAttributesHandler;
 import org.traccar.handler.FilterHandler;
@@ -252,6 +253,7 @@ public class MainModule extends AbstractModule {
             String key = config.getString(Keys.GEOLOCATION_KEY);
             return switch (type) {
                 case "opencellid" -> new OpenCellIdGeolocationProvider(client, url, key);
+                case "gps4pets" -> new GPS4PETSGeolocationProvider(client, url, key);
                 case "unwired" -> new UnwiredGeolocationProvider(client, url, key);
                 default -> new GoogleGeolocationProvider(client, key);
             };

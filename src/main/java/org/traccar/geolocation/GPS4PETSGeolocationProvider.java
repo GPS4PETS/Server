@@ -22,17 +22,17 @@ import jakarta.json.JsonObject;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.InvocationCallback;
 
-public class OpenCellIdGeolocationProvider implements GeolocationProvider {
+public class GPS4PETSGeolocationProvider implements GeolocationProvider {
 
     private final Client client;
     private final String url;
 
-    public OpenCellIdGeolocationProvider(Client client, String url, String key) {
+    public GPS4PETSGeolocationProvider(Client client, String url, String key) {
         this.client = client;
         if (url == null) {
-            url = "http://opencellid.org/cell/get";
+            url = "http://opencellid.gps4pets.de/";
         }
-        this.url = url + "?format=json&mcc=%d&mnc=%d&lac=%d&cellid=%d&key=" + key;
+        this.url = url + "?mcc=%d&mnc=%d&lac=%d&cell_id=%d";
     }
 
     @Override
