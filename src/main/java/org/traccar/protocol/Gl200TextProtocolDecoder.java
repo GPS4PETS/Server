@@ -991,7 +991,7 @@ public class Gl200TextProtocolDecoder extends BaseProtocolDecoder {
         } else {
             position.set(Position.KEY_BATTERY_LEVEL, v[index++].isEmpty() ? null : Integer.parseInt(v[index - 1]));
             if (!v[index++].isEmpty()) {
-                decodeStatus(position, Long.parseLong(v[index - 1]));
+                decodeStatus(position, Long.parseLong(v[index - 1], 16));
             }
             index += 1; // reserved / uart device type
         }
@@ -1060,7 +1060,9 @@ public class Gl200TextProtocolDecoder extends BaseProtocolDecoder {
 
         position.set(Position.KEY_IGNITION, type.contains("GN"));
         position.set(Position.KEY_HOURS, parseHours(v[index++]));
-        position.set(Position.KEY_ODOMETER, Double.parseDouble(v[index]) * 1000);
+        if (!v[index++].isEmpty()) {
+            position.set(Position.KEY_ODOMETER, Double.parseDouble(v[index - 1]) * 1000);
+        }
 
         Date time = dateFormat.parse(v[v.length - 2]);
         if (ignoreFixTime) {
