@@ -11,8 +11,7 @@ id = '123456789'
 server = 'localhost:5055'
 period = 5
 step = 0.001
-device_speed = 40
-driver_id = '123456'
+device_speed = 8
 
 file_path = 'track.pos'
 
@@ -40,22 +39,10 @@ for i in range(0, len(waypoints)):
             lon = lon1 + (lon2 - lon1) * j / count
             points.append((lat, lon))
 
-def send(conn, lat, lon, altitude, course, speed, battery, alarm, ignition, accuracy, rpm, fuel, driverUniqueId):
+def send(conn, lat, lon, altitude, course, speed, battery, accuracy):
     params = (('id', id), ('timestamp', int(time.time())), ('lat', lat), ('lon', lon), ('altitude', altitude), ('bearing', course), ('speed', speed), ('batt', battery))
-    if alarm:
-        params = params + (('alarm', 'sos'),)
-    if ignition:
-        params = params + (('ignition', 'true'),)
-    else:
-        params = params + (('ignition', 'false'),)
     if accuracy:
         params = params + (('accuracy', accuracy),)
-    if rpm:
-        params = params + (('rpm', rpm),)
-    if fuel:
-        params = params + (('fuel', fuel),)
-    if driverUniqueId:
-        params = params + (('driverUniqueId', driverUniqueId),)
     conn.request('GET', '?' + urllib.parse.urlencode(params))
     conn.getresponse().read()
 
@@ -79,13 +66,8 @@ while True:
         (lat2, lon2) = points[(index + 1) % len(points)]
         altitude = 50
         speed = device_speed if (index % len(points)) != 0 else 0
-        alarm = (index % 10) == 0
         battery = random.randint(0, 100)
-        ignition = (index / 10 % 2) != 0
         accuracy = 100 if (index % 10) == 0 else 0
-        rpm = random.randint(500, 4000)
-        fuel = random.randint(0, 80)
-        driverUniqueId = driver_id if (index % len(points)) == 0 else False
-        send(conn, lat1, lon1, altitude, course(lat1, lon1, lat2, lon2), speed, battery, alarm, ignition, accuracy, rpm, fuel, driverUniqueId)
+        send(conn, lat1, lon1, altitude, course(lat1, lon1, lat2, lon2), speed, battery, accuracy)
     time.sleep(period)
     index += 1
