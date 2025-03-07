@@ -46,6 +46,7 @@ public class HuabaoProtocol extends BaseProtocol {
                 Command.TYPE_LIVEMODE_ON,
                 Command.TYPE_LIVEMODE_OFF,
                 Command.TYPE_SET_APN,
+                Command.TYPE_CORNER_RADIUS,
                 Command.TYPE_TRANSPARENT,
                 Command.TYPE_TRANSPARENT_SER);
         addServer(new TrackerServer(config, getName(), false) {

@@ -87,6 +87,7 @@ public class Command extends BaseCommand {
     public static final String TYPE_LIVEMODE_ON = "liveModeOn";
     public static final String TYPE_LIVEMODE_OFF = "liveModeOff";
     public static final String TYPE_SET_APN = "setApn";
+    public static final String TYPE_CORNER_RADIUS = "cornerRadius";
 
     public static final String KEY_UNIQUE_ID = "uniqueId";
     public static final String KEY_FREQUENCY = "frequency";

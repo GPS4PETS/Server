@@ -181,6 +181,18 @@ public class HuabaoProtocolEncoder extends BaseProtocolEncoder {
                     data.writeShort(command.getInteger(Command.KEY_DURATION));
                     return HuabaoProtocolDecoder.formatMessage(
                             0x7e, HuabaoProtocolDecoder.MSG_TERMINAL_CONTROL, id, data, true);
+                case Command.TYPE_CORNER_RADIUS:
+                    data.writeByte(0x00);
+                    data.writeByte(0xa7);
+                    data.writeByte(1);
+                    data.writeByte(0x00);
+                    data.writeByte(0x00);
+                    data.writeByte(0x00);
+                    data.writeByte(0x30);
+                    data.writeByte(4); // parameter value length
+                    data.writeShort(command.getInteger(Command.KEY_RADIUS));
+                    return HuabaoProtocolDecoder.formatMessage(
+                        0x7e, HuabaoProtocolDecoder.MSG_PARAMETER_SETTING, id, data, true);
                 case Command.TYPE_LIVEMODE_ON:
                     data.writeByte(0x00);
                     data.writeByte(0xa9);
