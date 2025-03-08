@@ -70,13 +70,15 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
     public static final int MSG_TIME_SYNC_REQUEST = 0x0109;
     public static final int MSG_TIME_SYNC_RESPONSE = 0x8109;
     public static final int MSG_PHOTO = 0x8888;
-    public static final int MSG_TRANSPARENT_ORIG = 0x0900;
+    public static final int MSG_TRANSPARENT_ORIG = 0x0999; //0x0900
     public static final int MSG_PARAMETER_SETTING_ORIG = 0x0310;
     public static final int MSG_PARAMETER_SETTING = 0x8103;
     public static final int MSG_SEND_TEXT_MESSAGE = 0x8300;
     public static final int MSG_REPORT_TEXT_MESSAGE = 0x6006;
     public static final int MSG_PARAMETER = 0x0FA0;
     public static final int MSG_TRANSPARENT = 0x8900;
+    public static final int MSG_TRANSPARENT_RECV = 0x0900;
+
 
     public static final int RESULT_SUCCESS = 0;
 
@@ -266,7 +268,7 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
                         formatMessage(delimiter, MSG_TERMINAL_REGISTER_RESPONSE, id, false, response), remoteAddress));
             }
 
-        } else if (type == MSG_REPORT_TEXT_MESSAGE) {
+        } else if (type == MSG_REPORT_TEXT_MESSAGE || type == MSG_TRANSPARENT_RECV) {
 
             sendGeneralResponse(channel, remoteAddress, id, type, index);
 
