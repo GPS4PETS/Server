@@ -39,8 +39,8 @@ for i in range(0, len(waypoints)):
             lon = lon1 + (lon2 - lon1) * j / count
             points.append((lat, lon))
 
-def send(conn, lat, lon, altitude, course, speed, battery, accuracy):
-    params = (('id', id), ('timestamp', int(time.time())), ('lat', lat), ('lon', lon), ('altitude', altitude), ('bearing', course), ('speed', speed), ('batt', battery))
+def send(conn, lat, lon, altitude, course, speed, battery, accuracy, steps):
+    params = (('id', id), ('timestamp', int(time.time())), ('lat', lat), ('lon', lon), ('altitude', altitude), ('bearing', course), ('speed', speed), ('batt', battery), ('steps', steps))
     if accuracy:
         params = params + (('accuracy', accuracy),)
     conn.request('GET', '?' + urllib.parse.urlencode(params))
@@ -56,6 +56,8 @@ def course(lat1, lon1, lat2, lon2):
     return (math.atan2(y, x) % (2 * math.pi)) * 180 / math.pi
 
 index = 0
+steps = 0
+battery = 100
 
 conn = httplib.HTTPConnection(server)
 
@@ -66,8 +68,9 @@ while True:
         (lat2, lon2) = points[(index + 1) % len(points)]
         altitude = 50
         speed = device_speed if (index % len(points)) != 0 else 0
-        battery = random.randint(0, 100)
-        accuracy = 100 if (index % 10) == 0 else 0
-        send(conn, lat1, lon1, altitude, course(lat1, lon1, lat2, lon2), speed, battery, accuracy)
+        battery -= 0.05
+        accuracy = 100 if (index % 10) == 10 else 50
+        steps += 20
+        send(conn, lat1, lon1, altitude, course(lat1, lon1, lat2, lon2), speed, battery, accuracy, steps)
     time.sleep(period)
     index += 1
