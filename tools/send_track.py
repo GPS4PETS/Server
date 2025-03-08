@@ -57,7 +57,7 @@ def course(lat1, lon1, lat2, lon2):
 
 index = 0
 steps = 0
-battery = 100.0
+battery = 100
 
 conn = httplib.HTTPConnection(server)
 
@@ -68,7 +68,7 @@ while True:
         (lat2, lon2) = points[(index + 1) % len(points)]
         altitude = 50
         speed = device_speed if (index % len(points)) != 0 else 0
-        battery -= 0.05
+        battery -= 1 if (index % 10) == 1 else 0
         accuracy = 100 if (index % 10) == 10 else 50
         steps += 20
         send(conn, lat1, lon1, altitude, course(lat1, lon1, lat2, lon2), speed, battery, accuracy, steps)
