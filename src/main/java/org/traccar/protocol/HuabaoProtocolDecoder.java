@@ -665,6 +665,76 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
                         position.set(Position.KEY_VIN, stringValue);
                     }
                     break;
+                case 0x9F:
+                    if (buf.getUnsignedShort(buf.readerIndex()) > 200) {
+                        int mcc = buf.readUnsignedShort();
+                        int mnc = buf.readUnsignedByte();
+                        while (buf.readerIndex() < endIndex) {
+                            network.addCellTower(CellTower.from(
+                                    mcc, mnc, buf.readUnsignedShort(), buf.readUnsignedShort(),
+                                    buf.readUnsignedByte()));
+                        }
+                    } else {
+                        while (buf.readerIndex() < endIndex) {
+                            int extendedLength = buf.readUnsignedShort();
+                            int extendedEndIndex = buf.readerIndex() + extendedLength;
+                            int extendedType = buf.readUnsignedShort();
+                            switch (extendedType) {
+                                case 0x0001:
+                                    position.set("fuel1", buf.readUnsignedShort() * 0.1);
+                                    buf.readUnsignedByte(); // unused
+                                    break;
+                                case 0x0023:
+                                    position.set("fuel2", Double.parseDouble(
+                                            buf.readCharSequence(6, StandardCharsets.US_ASCII).toString()));
+                                    break;
+                                case 0x0054:
+                                    buf.readUnsignedByte(); // count
+                                    String[] wifi = buf.readCharSequence(
+                                            extendedLength - 3, StandardCharsets.US_ASCII).toString().split(",");
+                                    for (int i = 0; i < wifi.length / 2; i++) {
+                                        network.addWifiAccessPoint(
+                                                WifiAccessPoint.from(wifi[i * 2], Integer.parseInt(wifi[i * 2 + 1])));
+                                    }
+                                    break;
+                                case 0x00B2:
+                                    position.set(Position.KEY_ICCID, ByteBufUtil.hexDump(
+                                            buf.readSlice(10)).replaceAll("f", ""));
+                                    break;
+                                case 0x00B9:
+                                    buf.readUnsignedByte(); // count
+                                    String[] wifi2 = buf.readCharSequence(
+                                            extendedLength - 3, StandardCharsets.US_ASCII).toString().split(",");
+                                    for (int i = 0; i < wifi2.length / 2; i++) {
+                                        network.addWifiAccessPoint(
+                                                WifiAccessPoint.from(wifi2[i * 2], Integer.parseInt(wifi2[i * 2 + 1])));
+                                    }
+                                    break;
+                                case 0x00C6:
+                                    int batteryAlarm = buf.readUnsignedByte();
+                                    if (batteryAlarm == 0x03 || batteryAlarm == 0x04) {
+                                        position.set(Position.KEY_ALARM, Position.ALARM_LOW_BATTERY);
+                                    }
+                                    position.set("batteryAlarm", batteryAlarm);
+                                    break;
+                                case 0x00CE:
+                                    position.set(Position.KEY_POWER, buf.readUnsignedShort() * 0.01);
+                                    break;
+                                case 0x00D8:
+                                    network.addCellTower(CellTower.from(
+                                            buf.readUnsignedShort(), buf.readUnsignedByte(),
+                                            buf.readUnsignedShort(), buf.readUnsignedInt()));
+                                    break;
+                                case 0x00A8, 0x00E1:
+                                    position.set(Position.KEY_BATTERY_LEVEL, buf.readUnsignedByte());
+                                    break;
+                                default:
+                                    break;
+                            }
+                            buf.readerIndex(extendedEndIndex);
+                        }
+                    }
+                    break;
                 case 0xAC:
                     position.set(Position.KEY_ODOMETER, buf.readUnsignedInt());
                     break;
