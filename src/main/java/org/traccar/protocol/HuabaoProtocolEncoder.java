@@ -84,7 +84,7 @@ public class HuabaoProtocolEncoder extends BaseProtocolEncoder {
                     data.writeByte(0x00);
                     data.writeByte(0x00);
                     data.writeByte(0x00);
-                    data.writeByte(0x27);
+                    data.writeByte(0x22);
                     data.writeByte(4); // parameter value length
                     data.writeInt(command.getInteger(Command.KEY_FREQUENCY));
                     return HuabaoProtocolDecoder.formatMessage(
@@ -96,7 +96,7 @@ public class HuabaoProtocolEncoder extends BaseProtocolEncoder {
                     data.writeByte(0x00);
                     data.writeByte(0x00);
                     data.writeByte(0x00);
-                    data.writeByte(0x22);
+                    data.writeByte(0x27);
                     data.writeByte(4); // parameter value length
                     data.writeInt(command.getInteger(Command.KEY_FREQUENCY));
                     return HuabaoProtocolDecoder.formatMessage(
