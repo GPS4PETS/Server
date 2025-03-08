@@ -57,7 +57,7 @@ def course(lat1, lon1, lat2, lon2):
 
 index = 0
 steps = 0
-battery = 100
+battery = 100.0
 
 conn = httplib.HTTPConnection(server)
 
