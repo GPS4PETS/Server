@@ -86,6 +86,16 @@ public class PositionLogger {
                 case "charge":
                     builder.append(", charge: ").append(position.getAttributes().get(Position.KEY_CHARGE));
                     break;
+                case "network":
+                    if (position.getNetwork() != null) {
+                        builder.append(", network: mcc: ").append(position.getNetwork().getHomeMobileCountryCode());
+                        builder.append(", mnc: ").append(position.getNetwork().getHomeMobileNetworkCode());
+                        builder.append(", towers: ").append(position.getNetwork().getCellTowers());
+                    }
+                case "wifi":
+                    if (position.getNetwork() != null) {
+                        builder.append(", wifi: ").append(position.getNetwork().getWifiAccessPoints());
+                    }
                 default:
                     Object value = position.getAttributes().get(attribute);
                     if (value != null) {

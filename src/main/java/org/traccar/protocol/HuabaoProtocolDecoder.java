@@ -70,7 +70,7 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
     public static final int MSG_TIME_SYNC_REQUEST = 0x0109;
     public static final int MSG_TIME_SYNC_RESPONSE = 0x8109;
     public static final int MSG_PHOTO = 0x8888;
-    public static final int MSG_TRANSPARENT_ORIG = 0x0999; //0x0900
+    public static final int MSG_TRANSPARENT_ORIG = 0x0999; // 0x0900
     public static final int MSG_PARAMETER_SETTING_ORIG = 0x0310;
     public static final int MSG_PARAMETER_SETTING = 0x8103;
     public static final int MSG_SEND_TEXT_MESSAGE = 0x8300;
@@ -78,7 +78,6 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
     public static final int MSG_PARAMETER = 0x0FA0;
     public static final int MSG_TRANSPARENT = 0x8900;
     public static final int MSG_TRANSPARENT_RECV = 0x0900;
-
 
     public static final int RESULT_SUCCESS = 0;
 
@@ -666,13 +665,22 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
                     }
                     break;
                 case 0x9F:
-                    if (buf.getUnsignedShort(buf.readerIndex()) > 200) {
-                        int mcc = buf.readUnsignedShort();
-                        int mnc = buf.readUnsignedByte();
+                    if (buf.getUnsignedShort(buf.readerIndex() + 1) > 200) {
+                        int mcc = Integer.parseInt(buf.readCharSequence(3, StandardCharsets.US_ASCII).toString());
+                        buf.readUnsignedByte();
+                        int mnc = Integer.parseInt(buf.readCharSequence(2, StandardCharsets.US_ASCII).toString());
                         while (buf.readerIndex() < endIndex) {
+                            buf.readUnsignedByte();
+                            int lac = Integer.parseInt(buf.readCharSequence(4, StandardCharsets.US_ASCII).toString(), 16);
+                            buf.readUnsignedByte();
+                            long cid = Long.parseLong(buf.readCharSequence(6, StandardCharsets.US_ASCII).toString(), 16);
+                            buf.readUnsignedByte();
+                            int rssi = buf.readUnsignedByte();
                             network.addCellTower(CellTower.from(
-                                    mcc, mnc, buf.readUnsignedShort(), buf.readUnsignedShort(),
-                                    buf.readUnsignedByte()));
+                                    mcc, mnc,
+                                    lac,
+                                    cid,
+                                    rssi));
                         }
                     } else {
                         while (buf.readerIndex() < endIndex) {
@@ -746,6 +754,8 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
                     stringValue = buf.readCharSequence(length, StandardCharsets.US_ASCII).toString();
                     position.set(Position.KEY_DRIVER_UNIQUE_ID, stringValue);
                     break;
+                case 0xCC:
+                    position.set(Position.KEY_ICCID, buf.readCharSequence(length, StandardCharsets.US_ASCII).toString());
                 case 0xD0:
                     long userStatus = buf.readUnsignedInt();
                     if (BitUtil.check(userStatus, 3)) {
@@ -907,7 +917,7 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
                     while (buf.readerIndex() < endIndex) {
                         String mac = ByteBufUtil.hexDump(buf.readSlice(6)).replaceAll("(..)", "$1:");
                         network.addWifiAccessPoint(WifiAccessPoint.from(
-                            mac.substring(0, mac.length() - 1), buf.readByte()));
+                                mac.substring(0, mac.length() - 1), buf.readByte()));
                     }
                     break;
                 case 0xF6:
