@@ -200,7 +200,7 @@ public class HuabaoProtocolEncoder extends BaseProtocolEncoder {
                     data.writeByte(0x00);
                     data.writeByte(0x00);
                     data.writeByte(0x00);
-                    data.writeByte(0x27);
+                    data.writeByte(0x22);
                     data.writeByte(4); // parameter value length
                     data.writeInt(2); // 2s interval
                     return HuabaoProtocolDecoder.formatMessage(
@@ -212,7 +212,7 @@ public class HuabaoProtocolEncoder extends BaseProtocolEncoder {
                     data.writeByte(0x00);
                     data.writeByte(0x00);
                     data.writeByte(0x00);
-                    data.writeByte(0x27);
+                    data.writeByte(0x22);
                     data.writeByte(4); // parameter value length
                     data.writeInt(60); // 60s interval
                     return HuabaoProtocolDecoder.formatMessage(
