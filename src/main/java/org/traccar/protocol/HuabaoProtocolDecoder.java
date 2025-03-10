@@ -40,12 +40,18 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HexFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
+
+    public static final Logger LOGGER = LoggerFactory.getLogger(HuabaoProtocolDecoder.class);
 
     public HuabaoProtocolDecoder(Protocol protocol) {
         super(protocol);
@@ -665,17 +671,19 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
                     }
                     break;
                 case 0x9F:
-                    if (buf.getUnsignedShort(buf.readerIndex() + 1) > 200) {
+                    if (buf.getUnsignedShort(buf.readerIndex()) > 200) {
                         int mcc = Integer.parseInt(buf.readCharSequence(3, StandardCharsets.US_ASCII).toString());
-                        buf.readUnsignedByte();
+                        buf.readByte();
                         int mnc = Integer.parseInt(buf.readCharSequence(2, StandardCharsets.US_ASCII).toString());
-                        while (buf.readerIndex() < endIndex) {
-                            buf.readUnsignedByte();
-                            int lac = Integer.parseInt(buf.readCharSequence(4, StandardCharsets.US_ASCII).toString(), 16);
-                            buf.readUnsignedByte();
-                            long cid = Long.parseLong(buf.readCharSequence(6, StandardCharsets.US_ASCII).toString(), 16);
-                            buf.readUnsignedByte();
+                        LOGGER.info("mcc: " + mcc + ", mnc: " + mnc);
+                        while (buf.readerIndex() < (endIndex - 1)) {
+                            buf.readByte();
+                            int lac = Integer.parseInt((buf.readCharSequence(4, StandardCharsets.US_ASCII).toString()), 16);
+                            buf.readByte();
+                            long cid = Long.parseLong((buf.readCharSequence(6, StandardCharsets.US_ASCII).toString()), 16);
+                            buf.readByte();
                             int rssi = buf.readUnsignedByte();
+                            LOGGER.info("lac: " + lac + ", cid: " + cid + ", rssi: " + rssi);
                             network.addCellTower(CellTower.from(
                                     mcc, mnc,
                                     lac,
