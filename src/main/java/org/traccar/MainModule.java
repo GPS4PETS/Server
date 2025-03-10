@@ -76,6 +76,7 @@ import org.traccar.geolocation.OpenCellIdGeolocationProvider;
 import org.traccar.geolocation.GPS4PETSGeolocationProvider;
 import org.traccar.geolocation.UnwiredGeolocationProvider;
 import org.traccar.handler.CopyAttributesHandler;
+import org.traccar.handler.CopyNetworkHandler;
 import org.traccar.handler.FilterHandler;
 import org.traccar.handler.GeocoderHandler;
 import org.traccar.handler.GeolocationHandler;
@@ -310,6 +311,15 @@ public class MainModule extends AbstractModule {
     public static CopyAttributesHandler provideCopyAttributesHandler(Config config, CacheManager cacheManager) {
         if (config.getBoolean(Keys.PROCESSING_COPY_ATTRIBUTES_ENABLE)) {
             return new CopyAttributesHandler(config, cacheManager);
+        }
+        return null;
+    }
+
+    @Singleton
+    @Provides
+    public static CopyNetworkHandler provideCopyNetworkHandler(Config config, CacheManager cacheManager) {
+        if (config.getBoolean(Keys.PROCESSING_COPY_NETWORK_ENABLE)) {
+            return new CopyNetworkHandler(config, cacheManager);
         }
         return null;
     }

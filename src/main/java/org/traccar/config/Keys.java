@@ -1586,6 +1586,14 @@ public final class Keys {
             List.of(KeyType.CONFIG, KeyType.DEVICE));
 
     /**
+     * Enable copying of missing network info from last position to the current one. Might be useful if device doesn't
+     * send it in every message.
+     */
+    public static final ConfigKey<Boolean> PROCESSING_COPY_NETWORK_ENABLE = new BooleanConfigKey(
+            "processing.copyNetwork.enable",
+            List.of(KeyType.CONFIG));
+
+    /**
      * Include device attributes in the computed attribute context.
      */
     public static final ConfigKey<Boolean> PROCESSING_COMPUTED_ATTRIBUTES_DEVICE_ATTRIBUTES = new BooleanConfigKey(

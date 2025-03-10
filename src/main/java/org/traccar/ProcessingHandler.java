@@ -27,6 +27,7 @@ import org.traccar.database.NotificationManager;
 import org.traccar.handler.BasePositionHandler;
 import org.traccar.handler.ComputedAttributesHandler;
 import org.traccar.handler.CopyAttributesHandler;
+import org.traccar.handler.CopyNetworkHandler;
 import org.traccar.handler.DatabaseHandler;
 import org.traccar.handler.DistanceHandler;
 import org.traccar.handler.DriverHandler;
@@ -110,6 +111,7 @@ public class ProcessingHandler extends ChannelInboundHandlerAdapter implements B
                 EngineHoursHandler.class,
                 DriverHandler.class,
                 CopyAttributesHandler.class,
+                CopyNetworkHandler.class,
                 PositionForwardingHandler.class,
                 DatabaseHandler.class)
                 .map((clazz) -> (BasePositionHandler) injector.getInstance(clazz))
