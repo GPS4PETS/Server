@@ -18,7 +18,6 @@ package org.traccar.handler;
 
 import jakarta.inject.Inject;
 import org.traccar.config.Config;
-import org.traccar.config.Keys;
 import org.traccar.model.Position;
 import org.traccar.session.cache.CacheManager;
 
