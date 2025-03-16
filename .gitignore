@@ -14,4 +14,4 @@ bin
 setup/OpenJDK*
 setup/innosetup*
 traccar-web/
-tools/nohub.out
+tools/nohup.out
