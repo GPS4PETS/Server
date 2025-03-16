@@ -6,25 +6,55 @@ import urllib
 import http.client as httplib
 import time
 import random
+import datetime
 
 id = '123456789'
 server = 'localhost:5055'
-period = 5
+
 step = 0.001
-device_speed = 8
 
 file_path = 'track.pos'
 
 with open(file_path, 'r') as file:
     file_content = file.read()
 
-file_split = file_content.split(" ")
+file_split = file_content.splitlines();
 
+timest = [];
 waypoints = [()];
+altitude = [];
+speed = [];
+attributes = [];
+battery = [];
+steps = [];
+distance = [];
+totalDistance = [];
+motion = [];
+charge = [];
 
 for temp in file_split:
-    tmp = temp.split(",")
-    waypoints.append((float(tmp[1]), float(tmp[0])))
+    tmp = temp.split(";")
+    timest.append(tmp[1]);
+    waypoints.append((float(tmp[2]), float(tmp[3])))
+    altitude.append(float(tmp[4].split(" ")[0]));
+    speed.append(float(tmp[5].split(" ")[0]));
+    attributes = tmp[6];
+    atttmp = attributes.split("  ");
+    for atmp in atttmp:
+        atspl = atmp.split("=");
+        if atspl[0] == "steps":
+            steps.append(atspl[1]);
+        if atspl[0] == "batteryLevel":
+            battery.append(atspl[1]);
+        if atspl[0] == "distance":
+            distance.append(atspl[1]);
+        if atspl[0] == "totalDistance":
+            totalDistance.append(atspl[1]);
+        if atspl[0] == "motion":
+            motion.append(atspl[1]);
+        if atspl[0] == "charge":
+            charge.append(atspl[1]);
+
 
 points = []
 
@@ -39,12 +69,14 @@ for i in range(0, len(waypoints)):
             lon = lon1 + (lon2 - lon1) * j / count
             points.append((lat, lon))
 
-def send(conn, lat, lon, altitude, course, speed, battery, accuracy, steps):
-    params = (('id', id), ('timestamp', int(time.time())), ('lat', lat), ('lon', lon), ('altitude', altitude), ('bearing', course), ('speed', speed), ('batt', battery), ('steps', steps))
-    if accuracy:
-        params = params + (('accuracy', accuracy),)
-    conn.request('GET', '?' + urllib.parse.urlencode(params))
-    conn.getresponse().read()
+def send(conn, lat, lon, altitude, course, speed, battery, steps, charge, distance, totalDistance):
+    params = (('id', id), ('timestamp', int(time.time())), ('lat', lat), ('lon', lon), ('altitude', altitude), 
+                ('bearing', course), ('speed', speed), ('batt', battery), ('steps', steps), ('charge', charge),
+                ('distance', distance), ('totalDistance', totalDistance));
+
+    conn.request('GET', '?' + urllib.parse.urlencode(params));
+    conn.getresponse().read();
+    print('GET', '?' + urllib.parse.urlencode(params));
 
 def course(lat1, lon1, lat2, lon2):
     lat1 = lat1 * math.pi / 180
@@ -56,8 +88,6 @@ def course(lat1, lon1, lat2, lon2):
     return (math.atan2(y, x) % (2 * math.pi)) * 180 / math.pi
 
 index = 0
-steps = 0
-battery = 100
 
 conn = httplib.HTTPConnection(server)
 
@@ -65,12 +95,12 @@ while True:
     print(str(index) + " from " + str(len(points)))
     if len(points[index]) == 2 and len(points[(index + 1)]) == 2:
         (lat1, lon1) = points[index % len(points)]
-        (lat2, lon2) = points[(index + 1) % len(points)]
-        altitude = 50
-        speed = device_speed if (index % len(points)) != 0 else 0
-        battery -= 1 if (index % 10) == 1 else 0
-        accuracy = 100 if (index % 10) == 10 else 50
-        steps += 20
-        send(conn, lat1, lon1, altitude, course(lat1, lon1, lat2, lon2), speed, battery, accuracy, steps)
-    time.sleep(period)
+        (lat2, lon2) = points[(index + 1) % len(points)];
+        send(conn, lat1, lon1, altitude[index], course(lat1, lon1, lat2, lon2), speed[index], battery[index], steps[index], charge[index], distance[index], totalDistance[index])
+    if index < (len(points) - 1):
+        zeit = time.mktime(datetime.datetime.strptime(timest[index], "%Y-%m-%d %H:%M:%S").timetuple());
+        nextzeit = time.mktime(datetime.datetime.strptime(timest[index + 1], "%Y-%m-%d %H:%M:%S").timetuple())
+        zeitdiff = nextzeit - zeit;
+        print (zeitdiff);
+        time.sleep(zeitdiff);
     index += 1
