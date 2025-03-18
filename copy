@@ -3,6 +3,7 @@ rm -rf /opt/traccar/lib/*
 rm /opt/traccar/tracker-server.jar
 
 cp -r /opt/traccar-git/target/lib/* /opt/traccar/lib/.
+cp /opt/traccar-git/schema/* /opt/traccar/schema/.
 cp /opt/traccar-git/target/tracker-server.jar /opt/traccar/.
 
 systemctl start traccar.service
