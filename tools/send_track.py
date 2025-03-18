@@ -13,7 +13,7 @@ server = 'localhost:5055'
 
 step = 0.001
 
-file_path = 'track.pos'
+file_path = '/opt/traccar-git/tools/track.pos'
 
 with open(file_path, 'r') as file:
     file_content = file.read()
