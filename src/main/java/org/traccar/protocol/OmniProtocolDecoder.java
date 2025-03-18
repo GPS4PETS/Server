@@ -25,8 +25,6 @@ import org.traccar.helper.UnitsConverter;
 import org.traccar.model.Position;
 import org.traccar.session.DeviceSession;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class OmniProtocolDecoder extends BaseMqttProtocolDecoder {
@@ -48,14 +46,13 @@ public class OmniProtocolDecoder extends BaseMqttProtocolDecoder {
         String type = json.getString("Method");
         switch (type) {
             case "Thing.event.heartbeat.post_reply":
-                
                 position.setDeviceId(deviceSession.getDeviceId());
 
                 position.setValid(true);
 
-                position.setTime(java.util.Date((long)(json.getString("Timestamp"))*1000));
+                position.setTime(new Date((long)(json.getJsonNumber("Timestamp").doubleValue())*1000L));
 
-                position.setAttributes(KEY_BATTERY_LEVEL, location.getJsonNumber("Bat_Vol"));
+                position.set(Position.KEY_BATTERY_LEVEL, (int)json.getJsonNumber("Bat_Vol").doubleValue());
 
                 return position;
             case "thing.event.Global Positioning System.Post":
@@ -63,14 +60,14 @@ public class OmniProtocolDecoder extends BaseMqttProtocolDecoder {
 
                 position.setValid(true);
 
-                position.setTime(java.util.Date((long)(json.getString("Timestamp"))*1000));
+                position.setTime(new Date((long)(json.getJsonNumber("Timestamp").doubleValue())*1000L));
 
                 JsonObject location = json.getJsonObject("Result");
                 position.setLatitude((location.getJsonNumber("pos_N").doubleValue() / 100) * (location.getString("GEO_NS") == "N" ? 1 : (-1)));
                 position.setLongitude((location.getJsonNumber("pos_E").doubleValue() / 100) * (location.getString("GEO_EW") == "W" ? 1 : (-1)));
 
-                position.setAccuracy(location.getJsonNumber("Hdop").doubleValue());
-                position.setAttributes(KEY_SATELLITES, location.getJsonNumber("gpsNum"));
+                position.set(Position.KEY_HDOP, location.getJsonNumber("Hdop").doubleValue());
+                position.set(Position.KEY_SATELLITES, (int)location.getJsonNumber("gpsNum").doubleValue());
 
                 position.set(Position.KEY_IGNITION, json.getString("ign").equals("on"));
 
