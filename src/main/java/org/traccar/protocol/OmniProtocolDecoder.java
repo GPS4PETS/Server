@@ -27,6 +27,7 @@ import org.traccar.session.DeviceSession;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class OmniProtocolDecoder extends BaseMqttProtocolDecoder {
 
@@ -42,29 +43,42 @@ public class OmniProtocolDecoder extends BaseMqttProtocolDecoder {
             json = Json.createReader(inputStream).readObject();
         }
 
-        String type = json.getString("rpt");
+        Position position = new Position(getProtocolName());
+
+        String type = json.getString("Method");
         switch (type) {
-            case "hf":
-            case "loc":
-                Position position = new Position(getProtocolName());
+            case "Thing.event.heartbeat.post_reply":
+                
                 position.setDeviceId(deviceSession.getDeviceId());
 
                 position.setValid(true);
 
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-                position.setTime(dateFormat.parse(json.getString("ts")));
+                position.setTime(java.util.Date((long)(json.getString("Timestamp"))*1000));
 
-                JsonObject location = json.getJsonObject("location");
-                position.setLatitude(location.getJsonNumber("lat").doubleValue());
-                position.setLongitude(location.getJsonNumber("lon").doubleValue());
+                position.setAttributes(KEY_BATTERY_LEVEL, location.getJsonNumber("Bat_Vol"));
 
-                position.setCourse(json.getInt("bear"));
-                position.setSpeed(UnitsConverter.knotsFromCps(json.getInt("spd")));
+                return position;
+            case "thing.event.Global Positioning System.Post":
+                position.setDeviceId(deviceSession.getDeviceId());
+
+                position.setValid(true);
+
+                position.setTime(java.util.Date((long)(json.getString("Timestamp"))*1000));
+
+                JsonObject location = json.getJsonObject("Result");
+                position.setLatitude((location.getJsonNumber("pos_N").doubleValue() / 100) * (location.getString("GEO_NS") == "N" ? 1 : (-1)));
+                position.setLongitude((location.getJsonNumber("pos_E").doubleValue() / 100) * (location.getString("GEO_EW") == "W" ? 1 : (-1)));
+
+                position.setAccuracy(location.getJsonNumber("Hdop").doubleValue());
+                position.setAttributes(KEY_SATELLITES, location.getJsonNumber("gpsNum"));
 
                 position.set(Position.KEY_IGNITION, json.getString("ign").equals("on"));
 
                 return position;
-
+            case "thing.event.Wifi.Post":
+                // found wifi networks
+            case "thing.event.Property.Post":
+                // alarm
             default:
                 return null;
         }
