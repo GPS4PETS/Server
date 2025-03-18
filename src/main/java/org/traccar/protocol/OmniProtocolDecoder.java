@@ -53,6 +53,9 @@ public class OmniProtocolDecoder extends BaseMqttProtocolDecoder {
                 position.setTime(new Date((long)(json.getJsonNumber("Timestamp").doubleValue())*1000L));
 
                 position.set(Position.KEY_BATTERY_LEVEL, (int)json.getJsonNumber("Bat_Vol").doubleValue());
+                position.set(Position.KEY_VERSION_FW, json.getString("FirmBios"));
+                position.set(Position.KEY_VERSION_HW, json.getString("Hardware"));
+                position.set(Position.KEY_RSSI, json.getString("CSQ"));
 
                 return position;
             case "thing.event.Global Positioning System.Post":
@@ -75,7 +78,17 @@ public class OmniProtocolDecoder extends BaseMqttProtocolDecoder {
             case "thing.event.Wifi.Post":
                 // found wifi networks
             case "thing.event.Property.Post":
-                // alarm
+                position.setDeviceId(deviceSession.getDeviceId());
+
+                position.setValid(true);
+
+                position.setTime(new Date((long)(json.getJsonNumber("Timestamp").doubleValue())*1000L));
+
+                if (json.getString("ChangeState") == "1") {
+                    position.set(Position.KEY_MOTION, json.getString("NoMove"));
+                    position.set(Position.ALARM_LOW_BATTERY, json.getString("Batstate"));
+                }
+                return position;
             default:
                 return null;
         }
