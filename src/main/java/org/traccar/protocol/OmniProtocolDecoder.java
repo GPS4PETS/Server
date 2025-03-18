@@ -21,7 +21,6 @@ import jakarta.json.JsonObject;
 import org.apache.kafka.common.utils.ByteBufferInputStream;
 import org.traccar.BaseMqttProtocolDecoder;
 import org.traccar.Protocol;
-import org.traccar.helper.UnitsConverter;
 import org.traccar.model.Position;
 import org.traccar.session.DeviceSession;
 
@@ -50,9 +49,9 @@ public class OmniProtocolDecoder extends BaseMqttProtocolDecoder {
 
                 position.setValid(true);
 
-                position.setTime(new Date((long)(json.getJsonNumber("Timestamp").doubleValue())*1000L));
+                position.setTime(new Date((long) (json.getJsonNumber("Timestamp").doubleValue()) * 1000L));
 
-                position.set(Position.KEY_BATTERY_LEVEL, (int)json.getJsonNumber("Bat_Vol").doubleValue());
+                position.set(Position.KEY_BATTERY_LEVEL, (int) json.getJsonNumber("Bat_Vol").doubleValue());
                 position.set(Position.KEY_VERSION_FW, json.getString("FirmBios"));
                 position.set(Position.KEY_VERSION_HW, json.getString("Hardware"));
                 position.set(Position.KEY_RSSI, json.getString("CSQ"));
@@ -63,11 +62,13 @@ public class OmniProtocolDecoder extends BaseMqttProtocolDecoder {
 
                 position.setValid(true);
 
-                position.setTime(new Date((long)(json.getJsonNumber("Timestamp").doubleValue())*1000L));
+                position.setTime(new Date((long) (json.getJsonNumber("Timestamp").doubleValue()) * 1000L));
 
                 JsonObject location = json.getJsonObject("Result");
-                position.setLatitude((location.getJsonNumber("pos_N").doubleValue() / 100) * (location.getString("GEO_NS") == "N" ? 1 : (-1)));
-                position.setLongitude((location.getJsonNumber("pos_E").doubleValue() / 100) * (location.getString("GEO_EW") == "W" ? 1 : (-1)));
+                position.setLatitude((location.getJsonNumber("pos_N").doubleValue() / 100) *
+                    (location.getString("GEO_NS") == "N" ? 1 : (-1)));
+                position.setLongitude((location.getJsonNumber("pos_E").doubleValue() / 100) *
+                    (location.getString("GEO_EW") == "W" ? 1 : (-1)));
 
                 position.set(Position.KEY_HDOP, location.getJsonNumber("Hdop").doubleValue());
                 position.set(Position.KEY_SATELLITES, (int)location.getJsonNumber("gpsNum").doubleValue());
@@ -82,7 +83,7 @@ public class OmniProtocolDecoder extends BaseMqttProtocolDecoder {
 
                 position.setValid(true);
 
-                position.setTime(new Date((long)(json.getJsonNumber("Timestamp").doubleValue())*1000L));
+                position.setTime(new Date((long) (json.getJsonNumber("Timestamp").doubleValue()) * 1000L));
 
                 if (json.getString("ChangeState") == "1") {
                     position.set(Position.KEY_MOTION, json.getString("NoMove"));
