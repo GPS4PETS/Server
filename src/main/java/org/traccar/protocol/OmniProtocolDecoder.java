@@ -65,13 +65,11 @@ public class OmniProtocolDecoder extends BaseMqttProtocolDecoder {
                 position.setTime(new Date((long) (json.getJsonNumber("Timestamp").doubleValue()) * 1000L));
 
                 JsonObject location = json.getJsonObject("Result");
-                position.setLatitude((location.getJsonNumber("pos_N").doubleValue() / 100) *
-                    (location.getString("GEO_NS") == "N" ? 1 : (-1)));
-                position.setLongitude((location.getJsonNumber("pos_E").doubleValue() / 100) *
-                    (location.getString("GEO_EW") == "W" ? 1 : (-1)));
+                position.setLatitude((location.getJsonNumber("pos_N").doubleValue() / 100) * (location.getString("GEO_NS") == "N" ? 1 : (-1)));
+                position.setLongitude((location.getJsonNumber("pos_E").doubleValue() / 100) * (location.getString("GEO_EW") == "W" ? 1 : (-1)));
 
                 position.set(Position.KEY_HDOP, location.getJsonNumber("Hdop").doubleValue());
-                position.set(Position.KEY_SATELLITES, (int)location.getJsonNumber("gpsNum").doubleValue());
+                position.set(Position.KEY_SATELLITES, (int) location.getJsonNumber("gpsNum").doubleValue());
 
                 position.set(Position.KEY_IGNITION, json.getString("ign").equals("on"));
 

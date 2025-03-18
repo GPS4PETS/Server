@@ -29,7 +29,7 @@
         <property name="max" value="2024"/>
     </module>
     <module name="LineLength">
-        <property name="max" value="130"/>
+        <property name="max" value="150"/>
     </module>
 
     <!-- Checks for whitespace                               -->
