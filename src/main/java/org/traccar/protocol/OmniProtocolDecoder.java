@@ -111,7 +111,7 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
             .number("(d+),")                     // firmware version
             .number("(d+),")                     // product type 1: 1st Pet Locator 2: 2nd Pet Locator 3: Personal Locator 4: Car Locator
             .number("(d+),")                     // rssi
-            .number("(([^,]+)#")                 // mac adress
+            .number("([^,]+)#")                 // mac adress
             .any()
             .compile();
 
