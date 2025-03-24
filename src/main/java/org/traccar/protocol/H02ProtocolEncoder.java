@@ -48,6 +48,7 @@ public class H02ProtocolEncoder extends StringProtocolEncoder {
 
     protected Object encodeCommand(Command command, Date time) {
         String uniqueId = getUniqueId(command.getDeviceId());
+        String frequency = "120";
 
         return switch (command.getType()) {
             case Command.TYPE_ALARM_ARM -> formatCommand(time, uniqueId, "SCF", "0", "0");
@@ -55,7 +56,7 @@ public class H02ProtocolEncoder extends StringProtocolEncoder {
             case Command.TYPE_ENGINE_STOP -> formatCommand(time, uniqueId, "S20", "1", "1");
             case Command.TYPE_ENGINE_RESUME -> formatCommand(time, uniqueId, "S20", "1", "0");
             case Command.TYPE_POSITION_PERIODIC -> {
-                String frequency = command.getAttributes().get(Command.KEY_FREQUENCY).toString();
+                frequency = command.getAttributes().get(Command.KEY_FREQUENCY).toString();
                 if (AttributeUtil.lookup(
                         getCacheManager(), Keys.PROTOCOL_ALTERNATIVE.withPrefix(getProtocolName()),
                         command.getDeviceId())) {
@@ -72,7 +73,7 @@ public class H02ProtocolEncoder extends StringProtocolEncoder {
             case Command.TYPE_LIGHT_ON -> formatCommand(time, uniqueId, "lsn1#");
             case Command.TYPE_LIGHT_OFF -> formatCommand(time, uniqueId, "lsn0#");
             case Command.TYPE_LIVEMODE_ON -> {
-                String frequency = '2';
+                frequency = "2";
                 if (AttributeUtil.lookup(
                         getCacheManager(), Keys.PROTOCOL_ALTERNATIVE.withPrefix(getProtocolName()),
                         command.getDeviceId())) {
@@ -82,7 +83,7 @@ public class H02ProtocolEncoder extends StringProtocolEncoder {
                 }
             }
             case Command.TYPE_LIVEMODE_OFF -> {
-                String frequency = '120';
+                frequency = "120";
                 if (AttributeUtil.lookup(
                         getCacheManager(), Keys.PROTOCOL_ALTERNATIVE.withPrefix(getProtocolName()),
                         command.getDeviceId())) {

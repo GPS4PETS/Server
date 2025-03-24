@@ -122,22 +122,16 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
         Position position = new Position(getProtocolName());
         position.setDeviceId(deviceSession.getDeviceId());
 
-        position.setValid(!parser.next().equals("L"));
-        position.setTime(parser.nextDateTime());
-        position.setLatitude(parser.nextCoordinate(Parser.CoordinateFormat.HEM_DEG_MIN));
-        position.setLongitude(parser.nextCoordinate(Parser.CoordinateFormat.HEM_DEG_MIN));
-        position.setSpeed(UnitsConverter.knotsFromKph(parser.nextInt()));
-        position.setCourse(parser.nextInt());
-
-        position.set(Position.PREFIX_TEMP + 1, parser.next());
-        position.set(Position.KEY_FUEL_LEVEL, parser.nextInt());
-        position.set(Position.KEY_SATELLITES, parser.nextInt());
+        parser.next();
+        parser.next();
+        position.set(Position.KEY_BATTERY_LEVEL, parser.nextInt());
         position.set(Position.KEY_RSSI, parser.nextInt());
-        position.set(Position.KEY_ODOMETER, parser.nextDouble() * 1000);
-        position.set(Position.KEY_DRIVER_UNIQUE_ID, parser.next());
-        position.set(Position.KEY_STATUS, parser.nextHexLong());
-        position.set(Position.KEY_EVENT, parser.nextInt());
-
+        parser.next();
+        parser.next();
+        parser.next();
+        parser.next();
+        position.set(Position.KEY_MOTION, parser.nextInt());
+        
         return position;
     }
 
