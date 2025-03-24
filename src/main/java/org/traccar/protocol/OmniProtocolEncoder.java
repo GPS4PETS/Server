@@ -25,9 +25,7 @@ public class OmniProtocolEncoder extends StringProtocolEncoder {
     }
 
     private Object formatCommand(Command command, String content) {
-        String uniqueId = getUniqueId(command.getDeviceId());
-        String result = String.format("*TRAS,OM,%s,%s#", uniqueId, content);
-        result += "\r\n";
+        String result = String.format("*TRAS,OM,%s,%s#\n", getUniqueId(command.getDeviceId()), content);
         return result;
     }
 
@@ -38,7 +36,7 @@ public class OmniProtocolEncoder extends StringProtocolEncoder {
                 formatCommand(command, "Centigrade0,1");
             case Command.TYPE_POWER_OFF ->
                 formatCommand(command, "Centigrade0,2");
-                case Command.TYPE_FACTORY_RESET ->
+            case Command.TYPE_FACTORY_RESET ->
                 formatCommand(command, "Centigrade0,3");
             case Command.TYPE_OMNISETUP ->
                 formatCommand(command, "S1,240,%s,%s,%s,5,%s,%s",

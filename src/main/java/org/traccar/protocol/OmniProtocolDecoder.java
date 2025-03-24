@@ -55,7 +55,7 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
             response.append(",");
             response.append(content);
             response.append(",");
-            response.append(new Date());
+            response.append(new Date().getTime() / 1000);
             response.append("#");
             response.append("\r\n");
             channel.writeAndFlush(new NetworkMessage(response.toString(), remoteAddress));
