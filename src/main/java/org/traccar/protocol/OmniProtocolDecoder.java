@@ -34,7 +34,6 @@ import org.traccar.session.DeviceSession;
 import org.traccar.Protocol;
 import org.traccar.helper.Parser;
 import org.traccar.helper.PatternBuilder;
-import org.traccar.helper.UnitsConverter;
 import org.traccar.model.Position;
 
 import java.net.SocketAddress;
@@ -83,7 +82,7 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
 
         var sat  = parser.nextInt();
         position.set(Position.KEY_SATELLITES, sat);
-        position.setValid(sat > 2 ? true : false);
+        position.setValid(sat > 2);
         position.set(Position.KEY_HDOP, parser.nextDouble() * 1000);
         position.setTime(new Date(parser.nextInt()));
 
@@ -97,7 +96,7 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
             .expression("Q0,")                   // Report Name
             .number("(d+),")                     // battery level
             .number("(d+),")                     // firmware version
-            .number("(d+),")                     // product type 1: First-generation Pet Locator 2: Second-generation Pet Locator 
+            .number("(d+),")                     // product type 1: First-generation Pet Locator 2: Second-generation Pet Locator
                                                  //              3: Personal Locator 4: Car Locator
             .number("(d+),")                     // rssi
             .number("(([^,]+)#")                 // mac adress
@@ -172,7 +171,7 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
         parser.next();
         parser.next();
         position.set(Position.KEY_MOTION, parser.nextInt());
-        
+
         return position;
     }
 

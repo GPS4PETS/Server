@@ -80,7 +80,8 @@ public class OmniProtocolEncoder extends StringProtocolEncoder {
     protected Object encodeCommand(Command command) {
 
         return switch (command.getType()) {
-            case Command.TYPE_POSITION_PERIODIC -> formatCommand(command, "*TRAS,OM,123456789123456,S1,240,300,%s,1,5,0,DD:00:00:00:00:00#\r\n", Command.KEY_FREQUENCY);
+            case Command.TYPE_POSITION_PERIODIC -> 
+                formatCommand(command, "*TRAS,OM,123456789123456,S1,240,300,%s,1,5,0,DD:00:00:00:00:00#\r\n", Command.KEY_FREQUENCY);
             default -> null;
         };
     }
