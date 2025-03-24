@@ -14,61 +14,9 @@
  * limitations under the License.
  */
 
- /*
-1.3.4S 1（Set functional parameters）
-
-Server->Locator *TRAS,OM,123456789123456,S1,240,300,5,1,5,1,DD:59:DC:F1:18:0B#<LF>
-1 Heartbeat interval (default 240 cannot be set)
-2 WIFI reporting interval (>=60S <24H)
-3 GPS reporting interval (>=0S <24H)
-4 Mobile detection switch 1 turn on 0 off. After turning on, the locator will automatically
-  turn off the tracking if there is no movement for ten minutes. Regularly report 45min for
-  an update.
-5 Low power alarm threshold set to "0" means that low power does not alarm range <100
-6 Whether to turn on home WIFI. After turning on, the locator will find the home WiFi and stop reporting the
-  location data.
-7 Set the home WIFI address. When the home WiFi address is set to turn on 8, the locator will turn off the
-  location report.
-
-Locator->Server *TRAR,OM,123456789123456,S1,240,300,5,1,5,1,DD:59:DC:F1:18:0B#<LF>
-1 Heartbeat interval
-2 WIFI reporting interval
-3 GPS tracking interval
-4 Mobile detection switch status 1 on 0 off once
-5 Low power alarm threshold
-6 Whether to turn on home WIFI.
-7 Set the home WIFI address.
-*/
-package org.traccar.protocol;
-
-import org.traccar.Protocol;
 import org.traccar.StringProtocolEncoder;
 import org.traccar.model.Command;
-
-/*
-1.3.4S 1（Set functional parameters）
-Server->Locator *TRAS,OM,123456789123456,S1,240,300,5,1,5,1,DD:59:DC:F1:18:0B#<LF>
-1 Heartbeat interval (default 240 cannot be set)
-2 WIFI reporting interval (>=60S <24H)
-3 GPS reporting interval (>=0S <24H)
-4 Mobile detection switch 1 turn on 0 off. After turning on, the locator will automatically
-  turn off the tracking if there is no movement for ten minutes. Regularly report 45min for
-  an update.
-5 Low power alarm threshold set to "0" means that low power does not alarm range <100
-6 Whether to turn on home WIFI. After turning on, the locator will find the home WiFi and stop reporting the
-  location data.
-7 Set the home WIFI address. When the home WiFi address is set to turn on 8, the locator will turn off the
-  location report.
-
-Locator->Server *TRAR,OM,123456789123456,S1,240,300,5,1,5,1,DD:59:DC:F1:18:0B#<LF>
-1 Heartbeat interval
-2 WIFI reporting interval
-3 GPS tracking interval
-4 Mobile detection switch status 1 on 0 off once
-5 Low power alarm threshold
-6 Whether to turn on home WIFI.
-7 Set the home WIFI addres
- */
+import org.traccar.Protocol;
 
 public class OmniProtocolEncoder extends StringProtocolEncoder {
 
@@ -76,14 +24,25 @@ public class OmniProtocolEncoder extends StringProtocolEncoder {
         super(protocol);
     }
 
+    private Object formatCommand(Command command, String content) {
+        String uniqueId = getUniqueId(command.getDeviceId());
+        String result = String.format("*TRAS,OM,%s,%s#", uniqueId, content);
+        result += "\r\n";
+        return result;
+    }
+
     @Override
     protected Object encodeCommand(Command command) {
-
         return switch (command.getType()) {
-            case Command.TYPE_POSITION_PERIODIC ->
-                formatCommand(command, "*TRAS,OM,123456789123456,S1,240,300,%s,1,5,0,DD:00:00:00:00:00#\r\n", Command.KEY_FREQUENCY);
+            case Command.TYPE_REBOOT_DEVICE ->
+                formatCommand(command, "Centigrade0,1");
+            case Command.TYPE_POWER_OFF ->
+                formatCommand(command, "Centigrade0,2");
+                case Command.TYPE_FACTORY_RESET ->
+                formatCommand(command, "Centigrade0,3");
+            case Command.TYPE_OMNISETUP ->
+                formatCommand(command, "S1,240,%s,%s,%s,5,%s,%s", Command.KEY_FREQUENCY, Command.KEY_MOTIONSLEEP, Command.KEY_HOMEWIFI, Command.KEY_HOMEWIFIMAC);
             default -> null;
         };
     }
-
 }

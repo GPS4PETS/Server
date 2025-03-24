@@ -31,8 +31,11 @@ public class OmniProtocol extends BaseProtocol {
     @Inject
     public OmniProtocol(Config config) {
         setSupportedDataCommands(
-                Command.TYPE_POSITION_PERIODIC
-                );
+            Command.TYPE_REBOOT_DEVICE,
+            Command.TYPE_POWER_OFF,
+            Command.TYPE_FACTORY_RESET,
+            Command.TYPE_OMNISETUP
+        );
         addServer(new TrackerServer(config, getName(), false) {
             @Override
             protected void addProtocolHandlers(PipelineBuilder pipeline, Config config) {

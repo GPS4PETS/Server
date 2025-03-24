@@ -48,11 +48,13 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
         super(protocol);
     }
 
-    private void sendResponse(Channel channel, SocketAddress remoteAddress, Long deviceId) {
+    private void sendResponse(Channel channel, SocketAddress remoteAddress, Long deviceId, String content) {
         if (channel != null) {
             StringBuilder response = new StringBuilder("*TRAS,OM,");
             response.append(deviceId);
-            response.append(",Q0,200,");
+            response.append(",");
+            response.append(content);
+            response.append(",");
             response.append(new Date());
             response.append("#");
             response.append("\r\n");
@@ -60,7 +62,6 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
         }
     }
 
-    /* *TRAR,OM,123456789123456,Dimension0,N,2238.07773,W,11407.55384,6,1.49,1599206439# */
     private static final Pattern PATTERN_POSITION = new PatternBuilder()
             .text("*TRAR,OM,")                   // header
             .expression("([^,]+),")              // id
@@ -76,7 +77,6 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
             .compile();
 
     private Object decodePosition(Channel channel, SocketAddress remoteAddress, String sentence) {
-
         Parser parser = new Parser(PATTERN_POSITION, sentence);
         if (!parser.matches()) {
             return null;
@@ -102,7 +102,6 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
         return position;
     }
 
-    /* *TRAR,OM,123456789123456,Q0,80,1101,1,20,8C:59:DC:F1:18:0B# */
     private static final Pattern PATTERN_REGISTER = new PatternBuilder()
             .text("*TRAR,OM,")                   // header
             .expression("([^,]+),")              // id
@@ -111,16 +110,17 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
             .number("(d+),")                     // firmware version
             .number("(d+),")                     // product type 1: 1st Pet Locator 2: 2nd Pet Locator 3: Personal Locator 4: Car Locator
             .number("(d+),")                     // rssi
-            .number("([^,]+)#")                 // mac adress
+            .number("([^,]+)#")                  // mac adress
             .any()
             .compile();
 
     private Object decodeRegister(Channel channel, SocketAddress remoteAddress, String sentence) {
-
         Parser parser = new Parser(PATTERN_POSITION, sentence);
         if (!parser.matches()) {
             return null;
         }
+
+        parser.next();
 
         DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, parser.next());
         if (deviceSession == null) {
@@ -128,18 +128,21 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
         }
 
         Position position = new Position(getProtocolName());
-        position.setDeviceId(deviceSession.getDeviceId());
+
+        parser.next();
+        position.set(Position.KEY_BATTERY_LEVEL, parser.nextInt());
+        parser.next();
+        parser.next();
+        position.set(Position.KEY_RSSI, parser.nextInt());
 
         position.setLatitude(parser.nextCoordinate(Parser.CoordinateFormat.HEM_DEG_MIN));
         position.setLongitude(parser.nextCoordinate(Parser.CoordinateFormat.HEM_DEG_MIN));
 
-        sendResponse(channel, remoteAddress, deviceSession.getDeviceId());
+        sendResponse(channel, remoteAddress, deviceSession.getDeviceId(), "0,200");
 
         return position;
     }
 
-
-    /* *TRAR,OM,123456789123456,H0,A7670C,A011B13A7670ME,80,20,240,300,60,60,1,1,DD:59:DC:F1:18:0B, 5# */
     private static final Pattern PATTERN_HEARTBEAT = new PatternBuilder()
             .text("*TRAR,OM,")                   // header
             .expression("([^,]+),")              // id
@@ -165,6 +168,8 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
             return null;
         }
 
+        parser.next();
+
         DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, parser.next());
         if (deviceSession == null) {
             return null;
@@ -173,6 +178,7 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
         Position position = new Position(getProtocolName());
         position.setDeviceId(deviceSession.getDeviceId());
 
+        parser.next();
         parser.next();
         parser.next();
         position.set(Position.KEY_BATTERY_LEVEL, parser.nextInt());

@@ -88,6 +88,7 @@ public class Command extends BaseCommand {
     public static final String TYPE_LIVEMODE_OFF = "liveModeOff";
     public static final String TYPE_SET_APN = "setApn";
     public static final String TYPE_CORNER_RADIUS = "cornerRadius";
+    public static final String TYPE_OMNISETUP = "omniSetup";
 
     public static final String KEY_UNIQUE_ID = "uniqueId";
     public static final String KEY_FREQUENCY = "frequency";
@@ -105,6 +106,10 @@ public class Command extends BaseCommand {
     public static final String KEY_DURATION = "duration";
     public static final String KEY_TK_WORKMODE = "tkWorkMode";
     public static final String KEY_NO_QUEUE = "noQueue";
+
+    public static final String KEY_HOMEWIFI = "homeWifi";
+    public static final String KEY_HOMEWIFIMAC = "homeWifiMac";
+    public static final String KEY_MOTIONSLEEP = "motionSleep";
 
     @QueryIgnore
     @Override
