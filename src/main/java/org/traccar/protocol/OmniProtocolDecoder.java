@@ -123,7 +123,7 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
         position.setLongitude(parser.nextCoordinate(Parser.CoordinateFormat.HEM_DEG_MIN));
 
         /* *TRAS,OM,123456789123456,Q0,200,1599206439# */
-        formatCommand(command, "*TRAS,OM,%s,Q0,200,%s#\r\n", deviceSession.getDeviceId(), new date());
+        // formatCommand(command, "*TRAS,OM,%s,Q0,200,%s#\r\n", deviceSession.getDeviceId(), new date());
 
         return position;
     }
