@@ -40,6 +40,8 @@ import org.traccar.model.Position;
 import java.net.SocketAddress;
 import java.util.regex.Pattern;
 
+import java.util.Date;
+
 public class OmniProtocolDecoder extends BaseProtocolDecoder {
 
     public OmniProtocolDecoder(Protocol protocol) {
@@ -88,13 +90,52 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
         return position;
     }
 
+    /* *TRAR,OM,123456789123456,Q0,80,1101,1,20,8C:59:DC:F1:18:0B# */
+    private static final Pattern PATTERN_REGISTER = new PatternBuilder()
+            .text("*TRAR,OM,")                   // header
+            .expression("([^,]+),")              // id
+            .expression("Q0,")                   // Report Name
+            .number("(d+),")                     // battery level
+            .number("(d+),")                     // firmware version
+            .number("(d+),")                     // product type 1: First-generation Pet Locator 2: Second-generation Pet Locator 
+                                                 //              3: Personal Locator 4: Car Locator
+            .number("(d+),")                     // rssi
+            .number("(([^,]+)#")                 // mac adress
+            .any()
+            .compile();
+
+    private Object decodeRegister(Channel channel, SocketAddress remoteAddress, String sentence) {
+
+        Parser parser = new Parser(PATTERN_POSITION, sentence);
+        if (!parser.matches()) {
+            return null;
+        }
+
+        DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, parser.next());
+        if (deviceSession == null) {
+            return null;
+        }
+
+        Position position = new Position(getProtocolName());
+        position.setDeviceId(deviceSession.getDeviceId());
+
+        position.setLatitude(parser.nextCoordinate(Parser.CoordinateFormat.HEM_DEG_MIN));
+        position.setLongitude(parser.nextCoordinate(Parser.CoordinateFormat.HEM_DEG_MIN));
+
+        /* *TRAS,OM,123456789123456,Q0,200,1599206439# */
+        formatCommand(command, "*TRAS,OM,%s,Q0,200,%s#\r\n", deviceSession.getDeviceId(), new date());
+
+        return position;
+    }
+
+
     /* *TRAR,OM,123456789123456,H0,A7670C,A011B13A7670ME,80,20,240,300,60,60,1,1,DD:59:DC:F1:18:0B, 5# */
     private static final Pattern PATTERN_HEARTBEAT = new PatternBuilder()
             .text("*TRAR,OM,")                   // header
             .expression("([^,]+),")              // id
             .text("H0,")                         // Report Name
-            .expression("([ABCL]),")             // communication modul
-            .expression("([ABCL]),")             // communication modul version
+            .expression("([^,]+),")             // communication modul
+            .expression("([^,]+),")             // communication modul version
             .number("(d+)")                      // battery level
             .number("(d+),")                     // rssi
             .number("(d+),")                     // heartbeat interval
@@ -102,7 +143,7 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
             .number("(d+),")                     // tracking interval
             .number("(d+),")                     // mobile detection switch
             .number("(d+),")                     // moving state
-            .expression("([ABCL]),")             // home wifi mac
+            .expression("([^,]+),")             // home wifi mac
             .number("(d+),")                     // low bat alarm
             .any()
             .compile();
@@ -144,6 +185,8 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
             return decodePosition(channel, remoteAddress, sentence);
         } else if (sentence.indexOf(",H0,") > 0) {
             return decodeHeartbeat(channel, remoteAddress, sentence);
+        } else if (sentence.indexOf(",Q0,") > 0) {
+            return decodeRegister(channel, remoteAddress, sentence);
         } else {
             return null;
         }
