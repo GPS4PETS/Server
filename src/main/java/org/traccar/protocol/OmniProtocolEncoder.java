@@ -41,7 +41,7 @@ public class OmniProtocolEncoder extends StringProtocolEncoder {
                 case Command.TYPE_FACTORY_RESET ->
                 formatCommand(command, "Centigrade0,3");
             case Command.TYPE_OMNISETUP ->
-                formatCommand(command, "S1,240,%s,%s,%s,5,%s,%s", 
+                formatCommand(command, "S1,240,%s,%s,%s,5,%s,%s",
                     Command.KEY_FREQUENCY, Command.KEY_MOTIONSLEEP, Command.KEY_HOMEWIFI, Command.KEY_HOMEWIFIMAC);
             default -> null;
         };
