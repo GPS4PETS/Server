@@ -47,12 +47,12 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
         super(protocol);
     }
 
-    private void sendResponse(Channel channel, SocketAddress remoteAddress, String deviceId) {
+    private void sendResponse(Channel channel, SocketAddress remoteAddress, Long deviceId) {
         if (channel != null) {
             StringBuilder response = new StringBuilder("*TRAS,OM,");
-            response.appaend(deviceId);
-            response.appaend(",Q0,200,");
-            response.append(new Date.timestamp());
+            response.append(deviceId);
+            response.append(",Q0,200,");
+            response.append(new Date());
             response.append("#");
             response.append("\r\n");
             channel.writeAndFlush(new NetworkMessage(response.toString(), remoteAddress));
