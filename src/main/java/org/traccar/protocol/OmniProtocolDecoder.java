@@ -47,14 +47,13 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
         super(protocol);
     }
 
-    private void sendResponse(Channel channel, SocketAddress remoteAddress, String type, Integer number) {
+    private void sendResponse(Channel channel, SocketAddress remoteAddress, String deviceId) {
         if (channel != null) {
-            StringBuilder response = new StringBuilder("#A");
-            response.append(type);
+            StringBuilder response = new StringBuilder("*TRAS,OM,");
+            response.appaend(deviceId);
+            response.appaend(",Q0,200,");
+            response.append(new Date.timestamp());
             response.append("#");
-            if (number != null) {
-                response.append(number);
-            }
             response.append("\r\n");
             channel.writeAndFlush(new NetworkMessage(response.toString(), remoteAddress));
         }
@@ -134,9 +133,7 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
         position.setLatitude(parser.nextCoordinate(Parser.CoordinateFormat.HEM_DEG_MIN));
         position.setLongitude(parser.nextCoordinate(Parser.CoordinateFormat.HEM_DEG_MIN));
 
-        /* *TRAS,OM,123456789123456,Q0,200,1599206439# */
-        // formatCommand(command, "*TRAS,OM,%s,Q0,200,%s#\r\n", deviceSession.getDeviceId(), new date());
-        // sendResponse(channel, remoteAddress, type, null); // heartbeat
+        sendResponse(channel, remoteAddress, deviceSession.getDeviceId());
 
         return position;
     }
