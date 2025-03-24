@@ -40,7 +40,11 @@ public class H02Protocol extends BaseProtocol {
                 Command.TYPE_SET_APN,
                 Command.TYPE_REBOOT_DEVICE,
                 Command.TYPE_GET_VERSION,
-                Command.TYPE_GET_DEVICE_STATUS
+                Command.TYPE_GET_DEVICE_STATUS,
+                Command.TYPE_LIGHT_ON,
+                Command.TYPE_LIGHT_OFF,
+                Command.TYPE_LIVEMODE_ON,
+                Command.TYPE_LIVEMODE_OFF
         );
         addServer(new TrackerServer(config, getName(), false) {
             @Override

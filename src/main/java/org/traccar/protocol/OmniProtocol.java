@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Anton Tananaev (anton@traccar.org)
+ * Copyright 2020 Anton Tananaev (anton@traccar.org)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,24 +15,32 @@
  */
 package org.traccar.protocol;
 
-import io.netty.handler.codec.mqtt.MqttDecoder;
-import io.netty.handler.codec.mqtt.MqttEncoder;
-import jakarta.inject.Inject;
+import io.netty.handler.codec.LineBasedFrameDecoder;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
 import org.traccar.BaseProtocol;
 import org.traccar.PipelineBuilder;
 import org.traccar.TrackerServer;
 import org.traccar.config.Config;
+import org.traccar.model.Command;
+
+import jakarta.inject.Inject;
 
 public class OmniProtocol extends BaseProtocol {
 
     @Inject
     public OmniProtocol(Config config) {
+        setSupportedDataCommands(
+                Command.TYPE_POSITION_PERIODIC
+                );
         addServer(new TrackerServer(config, getName(), false) {
             @Override
             protected void addProtocolHandlers(PipelineBuilder pipeline, Config config) {
-                pipeline.addLast(MqttEncoder.INSTANCE);
-                pipeline.addLast(new MqttDecoder());
-                pipeline.addLast(new OmniProtocolDecoder(OmniProtocol.this));
+                pipeline.addLast(new LineBasedFrameDecoder(1024));
+                pipeline.addLast(new StringEncoder());
+                pipeline.addLast(new StringDecoder());
+                pipeline.addLast(new PortmanProtocolEncoder(OmniProtocol.this));
+                pipeline.addLast(new PortmanProtocolDecoder(OmniProtocol.this));
             }
         });
     }

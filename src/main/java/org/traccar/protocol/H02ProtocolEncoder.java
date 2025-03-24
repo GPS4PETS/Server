@@ -69,6 +69,28 @@ public class H02ProtocolEncoder extends StringProtocolEncoder {
             case Command.TYPE_GET_VERSION -> formatCommand(time, uniqueId, "S26", "1");
             case Command.TYPE_GET_DEVICE_STATUS -> formatCommand(time, uniqueId, "S26", "0");
             case Command.TYPE_POSITION_SINGLE -> formatCommand(time, uniqueId, "CR");
+            case Command.TYPE_LIGHT_ON -> formatCommand(time, uniqueId, "lsn1#");
+            case Command.TYPE_LIGHT_OFF -> formatCommand(time, uniqueId, "lsn0#");
+            case Command.TYPE_LIVEMODE_ON -> {
+                String frequency = '2';
+                if (AttributeUtil.lookup(
+                        getCacheManager(), Keys.PROTOCOL_ALTERNATIVE.withPrefix(getProtocolName()),
+                        command.getDeviceId())) {
+                    yield formatCommand(time, uniqueId, "D1", frequency);
+                } else {
+                    yield formatCommand(time, uniqueId, "S71", "22", frequency);
+                }
+            }
+            case Command.TYPE_LIVEMODE_OFF -> {
+                String frequency = '120';
+                if (AttributeUtil.lookup(
+                        getCacheManager(), Keys.PROTOCOL_ALTERNATIVE.withPrefix(getProtocolName()),
+                        command.getDeviceId())) {
+                    yield formatCommand(time, uniqueId, "D1", frequency);
+                } else {
+                    yield formatCommand(time, uniqueId, "S71", "22", frequency);
+                }
+            }
             default -> null;
         };
     }

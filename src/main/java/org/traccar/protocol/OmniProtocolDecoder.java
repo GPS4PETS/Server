@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Anton Tananaev (anton@traccar.org)
+ * Copyright 2020 - 2023 Anton Tananaev (anton@traccar.org)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,81 +15,170 @@
  */
 package org.traccar.protocol;
 
-import io.netty.handler.codec.mqtt.MqttPublishMessage;
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import org.apache.kafka.common.utils.ByteBufferInputStream;
-import org.traccar.BaseMqttProtocolDecoder;
-import org.traccar.Protocol;
-import org.traccar.model.Position;
+import io.netty.channel.Channel;
+import org.traccar.BaseProtocolDecoder;
 import org.traccar.session.DeviceSession;
+import org.traccar.Protocol;
+import org.traccar.helper.Parser;
+import org.traccar.helper.PatternBuilder;
+import org.traccar.helper.UnitsConverter;
+import org.traccar.model.Position;
 
-import java.util.Date;
+import java.net.SocketAddress;
+import java.util.regex.Pattern;
 
-public class OmniProtocolDecoder extends BaseMqttProtocolDecoder {
+public class OmniProtocolDecoder extends BaseProtocolDecoder {
 
     public OmniProtocolDecoder(Protocol protocol) {
         super(protocol);
     }
 
-    @Override
-    protected Object decode(DeviceSession deviceSession, MqttPublishMessage message) throws Exception {
+    private static final Pattern PATTERN_STANDARD = new PatternBuilder()
+            .groupBegin()
+            .text("$PTMLA,")                     // header
+            .or()
+            .text("%%")                          // header
+            .groupEnd()
+            .expression("([^,]+),")              // id
+            .expression("([ABCL]),")             // validity
+            .number("(dd)(dd)(dd)")              // date (yymmdd)
+            .number("(dd)(dd)(dd),")             // time (hhmmss)
+            .expression("([NS])")
+            .number("(dd)(dd.d+)")               // latitude
+            .expression("([EW])")
+            .number("(d{2,3})(dd.d+),")          // longitude
+            .number("(d+),")                     // speed
+            .number("(d+),")                     // course
+            .number("(?:NA|C(-?d+)),")           // temperature
+            .number("(x{8}),")                   // status
+            .groupBegin()
+            .text("NA")
+            .or()
+            .number("F(d+)")                     // fuel
+            .or()
+            .number("(d+)")                      // card id
+            .groupEnd(",")
+            .number("(d+),")                     // event
+            .number("(d+),")                     // satellites
+            .number("(d+.d+),")                  // odometer
+            .number("(d+)")                      // rssi
+            .number(",G(d+)").optional()         // fuel
+            .any()
+            .compile();
 
-        JsonObject json;
-        try (ByteBufferInputStream inputStream = new ByteBufferInputStream(message.payload().nioBuffer())) {
-            json = Json.createReader(inputStream).readObject();
+    private Object decodeStandard(Channel channel, SocketAddress remoteAddress, String sentence) {
+
+        Parser parser = new Parser(PATTERN_STANDARD, sentence);
+        if (!parser.matches()) {
+            return null;
+        }
+
+        DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, parser.next());
+        if (deviceSession == null) {
+            return null;
         }
 
         Position position = new Position(getProtocolName());
+        position.setDeviceId(deviceSession.getDeviceId());
 
-        String type = json.getString("Method");
-        switch (type) {
-            case "Thing.event.heartbeat.post_reply":
-                position.setDeviceId(deviceSession.getDeviceId());
+        position.setValid(!parser.next().equals("L"));
+        position.setTime(parser.nextDateTime());
+        position.setLatitude(parser.nextCoordinate(Parser.CoordinateFormat.HEM_DEG_MIN));
+        position.setLongitude(parser.nextCoordinate(Parser.CoordinateFormat.HEM_DEG_MIN));
+        position.setSpeed(UnitsConverter.knotsFromKph(parser.nextInt()));
+        position.setCourse(parser.nextInt());
 
-                position.setValid(true);
+        position.set(Position.PREFIX_TEMP + 1, parser.next());
+        position.set(Position.KEY_STATUS, parser.nextHexLong());
+        if (parser.hasNext()) {
+            position.set(Position.KEY_FUEL_LEVEL, parser.nextInt() * 0.1);
+        }
+        position.set(Position.KEY_DRIVER_UNIQUE_ID, parser.next());
 
-                position.setTime(new Date((long) (json.getJsonNumber("Timestamp").doubleValue()) * 1000L));
+        int event = parser.nextInt();
+        position.set(Position.KEY_EVENT, event);
+        if (event == 253) {
+            position.set(Position.KEY_IGNITION, true);
+        } else if (event == 254) {
+            position.set(Position.KEY_IGNITION, false);
+        }
 
-                position.set(Position.KEY_BATTERY_LEVEL, (int) json.getJsonNumber("Bat_Vol").doubleValue());
-                position.set(Position.KEY_VERSION_FW, json.getString("FirmBios"));
-                position.set(Position.KEY_VERSION_HW, json.getString("Hardware"));
-                position.set(Position.KEY_RSSI, json.getString("CSQ"));
+        position.set(Position.KEY_SATELLITES, parser.nextInt());
+        position.set(Position.KEY_ODOMETER, parser.nextDouble() * 1000);
+        position.set(Position.KEY_RSSI, parser.nextInt());
+        position.set(Position.KEY_FUEL_LEVEL, parser.nextInt());
 
-                return position;
-            case "thing.event.Global Positioning System.Post":
-                position.setDeviceId(deviceSession.getDeviceId());
+        return position;
+    }
 
-                position.setValid(true);
+    private static final Pattern PATTERN_EXTENDED = new PatternBuilder()
+            .text("$EXT,")                        // header
+            .expression("([^,]+),")              // id
+            .expression("([ABCL]),")             // validity
+            .number("(dd)(dd)(dd)")              // date (yymmdd)
+            .number("(dd)(dd)(dd),")             // time (hhmmss)
+            .expression("([NS])")
+            .number("(dd)(dd.d+)")               // latitude
+            .expression("([EW])")
+            .number("(d{2,3})(dd.d+),")          // longitude
+            .number("(d+),")                     // speed
+            .number("(d+),")                     // course
+            .number("(?:NA|C(-?d+)),")           // temperature
+            .number("(?:NA|F(d+)),")             // fuel
+            .number("(d+),")                     // satellites
+            .number("(d+),")                     // rssi
+            .number("(d+.d+),")                  // odometer
+            .number("(?:NA|(d+)),")              // card id
+            .number("(x{8}),")                   // status
+            .number("(d+)")                      // event
+            .any()
+            .compile();
 
-                position.setTime(new Date((long) (json.getJsonNumber("Timestamp").doubleValue()) * 1000L));
+    private Object decodeExtended(Channel channel, SocketAddress remoteAddress, String sentence) {
 
-                JsonObject location = json.getJsonObject("Result");
-                position.setLatitude((location.getJsonNumber("pos_N").doubleValue() / 100) * (location.getString("GEO_NS") == "N" ? 1 : (-1)));
-                position.setLongitude((location.getJsonNumber("pos_E").doubleValue() / 100) * (location.getString("GEO_EW") == "W" ? 1 : (-1)));
+        Parser parser = new Parser(PATTERN_EXTENDED, sentence);
+        if (!parser.matches()) {
+            return null;
+        }
 
-                position.set(Position.KEY_HDOP, location.getJsonNumber("Hdop").doubleValue());
-                position.set(Position.KEY_SATELLITES, (int) location.getJsonNumber("gpsNum").doubleValue());
+        DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, parser.next());
+        if (deviceSession == null) {
+            return null;
+        }
 
-                position.set(Position.KEY_IGNITION, json.getString("ign").equals("on"));
+        Position position = new Position(getProtocolName());
+        position.setDeviceId(deviceSession.getDeviceId());
 
-                return position;
-            case "thing.event.Wifi.Post":
-                // found wifi networks
-            case "thing.event.Property.Post":
-                position.setDeviceId(deviceSession.getDeviceId());
+        position.setValid(!parser.next().equals("L"));
+        position.setTime(parser.nextDateTime());
+        position.setLatitude(parser.nextCoordinate(Parser.CoordinateFormat.HEM_DEG_MIN));
+        position.setLongitude(parser.nextCoordinate(Parser.CoordinateFormat.HEM_DEG_MIN));
+        position.setSpeed(UnitsConverter.knotsFromKph(parser.nextInt()));
+        position.setCourse(parser.nextInt());
 
-                position.setValid(true);
+        position.set(Position.PREFIX_TEMP + 1, parser.next());
+        position.set(Position.KEY_FUEL_LEVEL, parser.nextInt());
+        position.set(Position.KEY_SATELLITES, parser.nextInt());
+        position.set(Position.KEY_RSSI, parser.nextInt());
+        position.set(Position.KEY_ODOMETER, parser.nextDouble() * 1000);
+        position.set(Position.KEY_DRIVER_UNIQUE_ID, parser.next());
+        position.set(Position.KEY_STATUS, parser.nextHexLong());
+        position.set(Position.KEY_EVENT, parser.nextInt());
 
-                position.setTime(new Date((long) (json.getJsonNumber("Timestamp").doubleValue()) * 1000L));
+        return position;
+    }
 
-                if (json.getString("ChangeState") == "1") {
-                    position.set(Position.KEY_MOTION, json.getString("NoMove"));
-                    position.set(Position.ALARM_LOW_BATTERY, json.getString("Batstate"));
-                }
-                return position;
-            default:
-                return null;
+    @Override
+    protected Object decode(
+            Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
+
+        String sentence = (String) msg;
+        if (sentence.startsWith("%%") || sentence.startsWith("$PTMLA")) {
+            return decodeStandard(channel, remoteAddress, sentence);
+        } else if (sentence.startsWith("$EXT")) {
+            return decodeExtended(channel, remoteAddress, sentence);
+        } else {
+            return null;
         }
     }
 
