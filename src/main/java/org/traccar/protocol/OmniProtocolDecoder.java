@@ -109,8 +109,7 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
             .expression("Q0,")                   // Report Name
             .number("(d+),")                     // battery level
             .number("(d+),")                     // firmware version
-            .number("(d+),")                     // product type 1: First-generation Pet Locator 2: Second-generation Pet Locator
-                                                 //              3: Personal Locator 4: Car Locator
+            .number("(d+),")                     // product type 1: 1st Pet Locator 2: 2nd Pet Locator 3: Personal Locator 4: Car Locator
             .number("(d+),")                     // rssi
             .number("(([^,]+)#")                 // mac adress
             .any()
@@ -145,8 +144,8 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
             .text("*TRAR,OM,")                   // header
             .expression("([^,]+),")              // id
             .text("H0,")                         // Report Name
-            .expression("([^,]+),")             // communication modul
-            .expression("([^,]+),")             // communication modul version
+            .expression("([^,]+),")              // communication modul
+            .expression("([^,]+),")              // communication modul version
             .number("(d+)")                      // battery level
             .number("(d+),")                     // rssi
             .number("(d+),")                     // heartbeat interval
@@ -154,7 +153,7 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
             .number("(d+),")                     // tracking interval
             .number("(d+),")                     // mobile detection switch
             .number("(d+),")                     // moving state
-            .expression("([^,]+),")             // home wifi mac
+            .expression("([^,]+),")              // home wifi mac
             .number("(d+),")                     // low bat alarm
             .any()
             .compile();
