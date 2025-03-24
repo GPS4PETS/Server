@@ -47,6 +47,19 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
         super(protocol);
     }
 
+    private void sendResponse(Channel channel, SocketAddress remoteAddress, String type, Integer number) {
+        if (channel != null) {
+            StringBuilder response = new StringBuilder("#A");
+            response.append(type);
+            response.append("#");
+            if (number != null) {
+                response.append(number);
+            }
+            response.append("\r\n");
+            channel.writeAndFlush(new NetworkMessage(response.toString(), remoteAddress));
+        }
+    }
+
     /* *TRAR,OM,123456789123456,Dimension0,N,2238.07773,W,11407.55384,6,1.49,1599206439# */
     private static final Pattern PATTERN_POSITION = new PatternBuilder()
             .text("*TRAR,OM,")                   // header
@@ -123,6 +136,7 @@ public class OmniProtocolDecoder extends BaseProtocolDecoder {
 
         /* *TRAS,OM,123456789123456,Q0,200,1599206439# */
         // formatCommand(command, "*TRAS,OM,%s,Q0,200,%s#\r\n", deviceSession.getDeviceId(), new date());
+        // sendResponse(channel, remoteAddress, type, null); // heartbeat
 
         return position;
     }
