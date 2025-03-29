@@ -31,6 +31,7 @@ import org.traccar.helper.PatternBuilder;
 import org.traccar.model.CellTower;
 import org.traccar.model.Network;
 import org.traccar.model.Position;
+import org.traccar.model.Device;
 
 import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -397,9 +398,27 @@ public class H02ProtocolDecoder extends BaseProtocolDecoder {
 
         if (parser.hasNext()) {
             String[] values = parser.next().split(",");
+            int mcc = 0, mnc = 0, lac = 0, cid = 0;
+
+            String model = getCacheManager().getObject(Device.class, deviceSession.getDeviceId()).getModel();
+
             for (int i = 0; i < values.length; i++) {
                 position.set(Position.PREFIX_IO + (i + 1), values[i].trim());
-            }
+                if (model == "PAJ-4G") {
+                    if (i == 0) {
+                        mcc = Integer.parseInt(values[i].trim());
+                    } else if (i == 1) {
+                        mnc = Integer.parseInt(values[i].trim());
+                    } else if (i == 2) {
+                        lac = Integer.parseInt(values[i].trim());
+                    } else if (i == 3) {
+                        cid = Integer.parseInt(values[i].trim());
+                        position.setNetwork(new Network(CellTower.from(mcc, mnc, lac, cid)));
+                    } else if (i == 4) {
+                        position.set(Position.KEY_BATTERY_LEVEL, values[i].trim());
+                    }
+                }
+            } 
         }
 
         return position;

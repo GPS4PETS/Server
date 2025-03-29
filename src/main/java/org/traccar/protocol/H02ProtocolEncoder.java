@@ -67,8 +67,8 @@ public class H02ProtocolEncoder extends StringProtocolEncoder {
             }
             case Command.TYPE_SET_APN -> formatCommand(time, uniqueId, "S24", Command.KEY_DATA, "", "");
             case Command.TYPE_REBOOT_DEVICE -> formatCommand(time, uniqueId, "CQ");
-            case Command.TYPE_GET_VERSION -> formatCommand(time, uniqueId, "S26", "1");
-            case Command.TYPE_GET_DEVICE_STATUS -> formatCommand(time, uniqueId, "S26", "0");
+            case Command.TYPE_GET_VERSION -> formatCommand(time, uniqueId, "PARAM1");
+            case Command.TYPE_GET_DEVICE_STATUS -> formatCommand(time, uniqueId, "STATUS");
             case Command.TYPE_POSITION_SINGLE -> formatCommand(time, uniqueId, "CR");
             case Command.TYPE_LIGHT_ON -> formatCommand(time, uniqueId, "lsn1#");
             case Command.TYPE_LIGHT_OFF -> formatCommand(time, uniqueId, "lsn0#");
