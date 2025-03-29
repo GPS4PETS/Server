@@ -37,7 +37,7 @@ public class H02ProtocolEncoder extends StringProtocolEncoder {
         StringBuilder result = new StringBuilder(
             String.format("*%s,%s,%s,%4$tH%4$tM%4$tS", MARKER, uniqueId, type, time));
 
-        if (notype == false) {
+        if (!notype) {
             for (String param : params) {
                 result.append(",").append(param);
             }
