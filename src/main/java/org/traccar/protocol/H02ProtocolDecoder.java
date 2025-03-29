@@ -418,7 +418,7 @@ public class H02ProtocolDecoder extends BaseProtocolDecoder {
                         position.set(Position.KEY_BATTERY_LEVEL, values[i].trim());
                     }
                 }
-            } 
+            }
         }
 
         return position;
