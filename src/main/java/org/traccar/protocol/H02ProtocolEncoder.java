@@ -32,13 +32,15 @@ public class H02ProtocolEncoder extends StringProtocolEncoder {
         super(protocol);
     }
 
-    private Object formatCommand(Date time, String uniqueId, String type, String... params) {
+    private Object formatCommand(Date time, String uniqueId, boolean notype, String type, String... params) {
 
         StringBuilder result = new StringBuilder(
-                String.format("*%s,%s,%s,%4$tH%4$tM%4$tS", MARKER, uniqueId, type, time));
+            String.format("*%s,%s,%s,%4$tH%4$tM%4$tS", MARKER, uniqueId, type, time));
 
-        for (String param : params) {
-            result.append(",").append(param);
+        if (notype == false) {
+            for (String param : params) {
+                result.append(",").append(param);
+            }
         }
 
         result.append("#");
@@ -51,35 +53,35 @@ public class H02ProtocolEncoder extends StringProtocolEncoder {
         String frequency = "120";
 
         return switch (command.getType()) {
-            case Command.TYPE_ALARM_ARM -> formatCommand(time, uniqueId, "SCF", "0", "0");
-            case Command.TYPE_ALARM_DISARM -> formatCommand(time, uniqueId, "SCF", "1", "1");
-            case Command.TYPE_ENGINE_STOP -> formatCommand(time, uniqueId, "S20", "1", "1");
-            case Command.TYPE_ENGINE_RESUME -> formatCommand(time, uniqueId, "S20", "1", "0");
+            case Command.TYPE_ALARM_ARM -> formatCommand(time, uniqueId, false, "SCF", "0", "0");
+            case Command.TYPE_ALARM_DISARM -> formatCommand(time, uniqueId, false, "SCF", "1", "1");
+            case Command.TYPE_ENGINE_STOP -> formatCommand(time, uniqueId, false, "S20", "1", "1");
+            case Command.TYPE_ENGINE_RESUME -> formatCommand(time, uniqueId, false, "S20", "1", "0");
             case Command.TYPE_POSITION_PERIODIC -> {
                 frequency = command.getAttributes().get(Command.KEY_FREQUENCY).toString();
                 if (AttributeUtil.lookup(
                         getCacheManager(), Keys.PROTOCOL_ALTERNATIVE.withPrefix(getProtocolName()),
                         command.getDeviceId())) {
-                    yield formatCommand(time, uniqueId, "D1", frequency);
+                    yield formatCommand(time, uniqueId, false, "D1", frequency);
                 } else {
-                    yield formatCommand(time, uniqueId, "S71", "22", frequency);
+                    yield formatCommand(time, uniqueId, false, "S71", "22", frequency);
                 }
             }
-            case Command.TYPE_SET_APN -> formatCommand(time, uniqueId, "S24", Command.KEY_DATA, "", "");
-            case Command.TYPE_REBOOT_DEVICE -> formatCommand(time, uniqueId, "CQ");
-            case Command.TYPE_GET_VERSION -> formatCommand(time, uniqueId, "PARAM1");
-            case Command.TYPE_GET_DEVICE_STATUS -> formatCommand(time, uniqueId, "STATUS");
-            case Command.TYPE_POSITION_SINGLE -> formatCommand(time, uniqueId, "CR");
-            case Command.TYPE_LIGHT_ON -> formatCommand(time, uniqueId, "lsn1#");
-            case Command.TYPE_LIGHT_OFF -> formatCommand(time, uniqueId, "lsn0#");
+            case Command.TYPE_SET_APN -> formatCommand(time, uniqueId, false, "S24", Command.KEY_DATA, "", "");
+            case Command.TYPE_REBOOT_DEVICE -> formatCommand(time, uniqueId, true, "CQ");
+            case Command.TYPE_GET_VERSION -> formatCommand(time, uniqueId, false, "S26", "1");
+            case Command.TYPE_GET_DEVICE_STATUS -> formatCommand(time, uniqueId, true, "INFO");
+            case Command.TYPE_POSITION_SINGLE -> formatCommand(time, uniqueId, true, "CR");
+            case Command.TYPE_LIGHT_ON -> formatCommand(time, uniqueId, true, "lsn1");
+            case Command.TYPE_LIGHT_OFF -> formatCommand(time, uniqueId, true, "lsn0");
             case Command.TYPE_LIVEMODE_ON -> {
                 frequency = "2";
                 if (AttributeUtil.lookup(
                         getCacheManager(), Keys.PROTOCOL_ALTERNATIVE.withPrefix(getProtocolName()),
                         command.getDeviceId())) {
-                    yield formatCommand(time, uniqueId, "D1", frequency);
+                    yield formatCommand(time, uniqueId, false, "D1", frequency);
                 } else {
-                    yield formatCommand(time, uniqueId, "S71", "22", frequency);
+                    yield formatCommand(time, uniqueId, false, "S71", "22", frequency);
                 }
             }
             case Command.TYPE_LIVEMODE_OFF -> {
@@ -87,9 +89,9 @@ public class H02ProtocolEncoder extends StringProtocolEncoder {
                 if (AttributeUtil.lookup(
                         getCacheManager(), Keys.PROTOCOL_ALTERNATIVE.withPrefix(getProtocolName()),
                         command.getDeviceId())) {
-                    yield formatCommand(time, uniqueId, "D1", frequency);
+                    yield formatCommand(time, uniqueId, false, "D1", frequency);
                 } else {
-                    yield formatCommand(time, uniqueId, "S71", "22", frequency);
+                    yield formatCommand(time, uniqueId, false, "S71", "22", frequency);
                 }
             }
             default -> null;
