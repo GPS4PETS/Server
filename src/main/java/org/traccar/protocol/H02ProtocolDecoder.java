@@ -403,7 +403,9 @@ public class H02ProtocolDecoder extends BaseProtocolDecoder {
             String model = getCacheManager().getObject(Device.class, deviceSession.getDeviceId()).getModel();
 
             for (int i = 0; i < values.length; i++) {
-                if (model.equals("PAJ-4G")) {
+                position.set(Position.PREFIX_IO + (i + 1), values[i].trim());
+
+                if (model != null && model.equals("PAJ-4G")) {
                     if (i == 0) {
                         mcc = Integer.parseInt(values[i].trim());
                     } else if (i == 1) {
@@ -416,8 +418,6 @@ public class H02ProtocolDecoder extends BaseProtocolDecoder {
                     } else if (i == 4) {
                         position.set(Position.KEY_BATTERY_LEVEL, values[i].trim());
                     }
-                } else {
-                    position.set(Position.PREFIX_IO + (i + 1), values[i].trim());
                 }
             }
         }
