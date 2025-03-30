@@ -89,6 +89,10 @@ public class Command extends BaseCommand {
     public static final String TYPE_SET_APN = "setApn";
     public static final String TYPE_CORNER_RADIUS = "cornerRadius";
     public static final String TYPE_OMNISETUP = "omniSetup";
+    public static final String TYPE_HOMEZONE1 = "homeZone1";
+    public static final String TYPE_HOMEZONE2 = "homeZone2";
+    public static final String TYPE_HOMEZONE1_OFF = "homeZone1Off";
+    public static final String TYPE_HOMEZONE2_OFF = "homeZone2Off";
 
     public static final String KEY_UNIQUE_ID = "uniqueId";
     public static final String KEY_FREQUENCY = "frequency";

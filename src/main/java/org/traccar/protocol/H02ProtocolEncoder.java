@@ -32,15 +32,17 @@ public class H02ProtocolEncoder extends StringProtocolEncoder {
         super(protocol);
     }
 
-    private Object formatCommand(Date time, String uniqueId, boolean notype, String type, String... params) {
+    private Object formatCommand(Date time, String uniqueId, boolean notime, String type, String... params) {
 
         StringBuilder result = new StringBuilder(
-            String.format("*%s,%s,%s,%4$tH%4$tM%4$tS", MARKER, uniqueId, type, time));
+            String.format("*%s,%s,%s", MARKER, uniqueId, type));
 
-        if (!notype) {
-            for (String param : params) {
-                result.append(",").append(param);
-            }
+        if (!notime) {
+            result.append(",").append(String.format("%4$tH%4$tM%4$tS", time));
+        }
+
+        for (String param : params) {
+            result.append(",").append(param);
         }
 
         result.append("#");
@@ -67,33 +69,14 @@ public class H02ProtocolEncoder extends StringProtocolEncoder {
                     yield formatCommand(time, uniqueId, false, "S71", "22", frequency);
                 }
             }
-            case Command.TYPE_SET_APN -> formatCommand(time, uniqueId, false, "S24", Command.KEY_DATA, "", "");
-            case Command.TYPE_REBOOT_DEVICE -> formatCommand(time, uniqueId, true, "CQ");
-            case Command.TYPE_GET_VERSION -> formatCommand(time, uniqueId, false, "S26", "1");
-            case Command.TYPE_GET_DEVICE_STATUS -> formatCommand(time, uniqueId, true, "INFO");
-            case Command.TYPE_POSITION_SINGLE -> formatCommand(time, uniqueId, true, "CR");
-            case Command.TYPE_LIGHT_ON -> formatCommand(time, uniqueId, true, "lsn1");
-            case Command.TYPE_LIGHT_OFF -> formatCommand(time, uniqueId, true, "lsn0");
-            case Command.TYPE_LIVEMODE_ON -> {
-                frequency = "2";
-                if (AttributeUtil.lookup(
-                        getCacheManager(), Keys.PROTOCOL_ALTERNATIVE.withPrefix(getProtocolName()),
-                        command.getDeviceId())) {
-                    yield formatCommand(time, uniqueId, false, "D1", frequency);
-                } else {
-                    yield formatCommand(time, uniqueId, false, "S71", "22", frequency);
-                }
-            }
-            case Command.TYPE_LIVEMODE_OFF -> {
-                frequency = "120";
-                if (AttributeUtil.lookup(
-                        getCacheManager(), Keys.PROTOCOL_ALTERNATIVE.withPrefix(getProtocolName()),
-                        command.getDeviceId())) {
-                    yield formatCommand(time, uniqueId, false, "D1", frequency);
-                } else {
-                    yield formatCommand(time, uniqueId, false, "S71", "22", frequency);
-                }
-            }
+            case Command.TYPE_LIGHT_ON -> formatCommand(time, uniqueId, true, "X2", "062108", "1");
+            case Command.TYPE_LIGHT_OFF -> formatCommand(time, uniqueId, true, "X2", "062108", "0");
+            case Command.TYPE_BUZZER_ON -> formatCommand(time, uniqueId, true, "X1", "062108", "60");
+            case Command.TYPE_BUZZER_OFF -> formatCommand(time, uniqueId, true, "X1", "062108", "0");
+            case Command.TYPE_LIVEMODE_ON -> formatCommand(time, uniqueId, true, "X5", "062108", "5", "300");
+            case Command.TYPE_LIVEMODE_OFF -> formatCommand(time, uniqueId, true, "X5", "062108", "5", "10");
+            case Command.TYPE_HOMEZONE1 -> formatCommand(time, uniqueId, true, "CHWALL", "062108", "");
+            case Command.TYPE_HOMEZONE1_OFF -> formatCommand(time, uniqueId, true, "DELWALL", "062108", "");
             default -> null;
         };
     }
