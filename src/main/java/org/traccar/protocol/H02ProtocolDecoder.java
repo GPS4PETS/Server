@@ -296,7 +296,7 @@ public class H02ProtocolDecoder extends BaseProtocolDecoder {
             .number("(d+)")                      // battery
             .any()
             .compile();
-    
+
     private static final Pattern PATTERN_SMS = new PatternBuilder()
             .text("*HQ,")
             .number("(d{0}),")                   // device id
@@ -635,7 +635,7 @@ public class H02ProtocolDecoder extends BaseProtocolDecoder {
         position.setDeviceId(deviceSession.getDeviceId());
 
         getLastLocation(position, null);
-        
+
         position.set(Position.KEY_RESULT, sentence);
 
         return position;
