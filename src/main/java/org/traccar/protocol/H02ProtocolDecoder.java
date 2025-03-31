@@ -296,6 +296,16 @@ public class H02ProtocolDecoder extends BaseProtocolDecoder {
             .number("(d+)")                      // battery
             .any()
             .compile();
+    
+    private static final Pattern PATTERN_SMS = new PatternBuilder()
+            .text("*HQ,")
+            .number("(d{0}),")                   // device id
+            .groupBegin()
+            .text("SMS,")
+            .expression("(.*)")                 // response
+            .groupEnd()
+            .text("#")
+            .compile();
 
     private void sendResponse(Channel channel, SocketAddress remoteAddress, String id, String type) {
         if (channel != null && id != null) {
@@ -610,6 +620,27 @@ public class H02ProtocolDecoder extends BaseProtocolDecoder {
         return position;
     }
 
+    private Position decodeSms(String sentence, Channel channel, SocketAddress remoteAddress) {
+        Parser parser = new Parser(PATTERN_SMS, sentence);
+        if (!parser.matches()) {
+            return null;
+        }
+
+        DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, parser.next());
+        if (deviceSession == null) {
+            return null;
+        }
+
+        Position position = new Position(getProtocolName());
+        position.setDeviceId(deviceSession.getDeviceId());
+
+        getLastLocation(position, null);
+        
+        position.set(Position.KEY_RESULT, sentence);
+
+        return position;
+    }
+
     @Override
     protected Object decode(
             Channel channel, SocketAddress remoteAddress, Object msg) throws Exception {
@@ -639,6 +670,7 @@ public class H02ProtocolDecoder extends BaseProtocolDecoder {
                         case "LINK" -> decodeLink(sentence, channel, remoteAddress);
                         case "V3" -> decodeV3(sentence, channel, remoteAddress);
                         case "VP1" -> decodeVp1(sentence, channel, remoteAddress);
+                        case "SMS" -> decodeSms(sentence, channel, remoteAddress);
                         default -> decodeText(sentence, channel, remoteAddress);
                     };
                 } else {
