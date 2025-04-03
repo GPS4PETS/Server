@@ -83,6 +83,7 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
     public static final int MSG_PARAMETER = 0x0FA0;
     public static final int MSG_TRANSPARENT = 0x8900;
     public static final int MSG_TRANSPARENT_RECV = 0x0900;
+    public static final int MSG_CONFIGURATION_PARAMETERS = 0x8103;
 
     public static final int RESULT_SUCCESS = 0;
 
@@ -154,6 +155,10 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
             if (BitUtil.check(value, 1)) {
                 position.addAlarm(Position.ALARM_TAMPERING);
             }
+        } else if (model != null && Set.of("AL300", "GL100").contains(model)) {
+            if (BitUtil.check(value, 16)) {
+                position.addAlarm(Position.ALARM_MOVEMENT);
+            }
         } else {
             if (BitUtil.check(value, 0)) {
                 position.addAlarm(Position.ALARM_SOS);
@@ -187,7 +192,9 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
                 position.addAlarm(Position.ALARM_MOVEMENT);
             }
             if (BitUtil.check(value, 29) || BitUtil.check(value, 30)) {
-                position.addAlarm(Position.ALARM_ACCIDENT);
+                if (model == null || !model.equals("VL300")) {
+                    position.addAlarm(Position.ALARM_ACCIDENT);
+                }
             }
         }
     }
@@ -533,6 +540,7 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
             int length = buf.readUnsignedByte();
             int endIndex = buf.readerIndex() + length;
             String stringValue;
+            int event;
             switch (subtype) {
                 case 0x01:
                     position.set(Position.KEY_ODOMETER, buf.readUnsignedInt() * 100);
@@ -597,7 +605,7 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
                     buf.skipBytes(4); // reserved
                     break;
                 case 0x60:
-                    int event = buf.readUnsignedShort();
+                    event = buf.readUnsignedShort();
                     position.set(Position.KEY_EVENT, event);
                     if (event >= 0x0061 && event <= 0x0066) {
                         buf.skipBytes(6); // lock id
@@ -928,13 +936,20 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
                     }
                     break;
                 case 0xF6:
-                    position.set(Position.KEY_EVENT, buf.readUnsignedByte());
+                    event = buf.readUnsignedByte();
+                    position.set(Position.KEY_EVENT, event);
+                    if (event == 2) {
+                        position.set(Position.KEY_MOTION, true);
+                    }
                     int fieldMask = buf.readUnsignedByte();
                     if (BitUtil.check(fieldMask, 0)) {
-                        buf.readUnsignedShort(); // light
+                        position.set("lightSensor", buf.readUnsignedShort());
                     }
                     if (BitUtil.check(fieldMask, 1)) {
                         position.set(Position.PREFIX_TEMP + 1, buf.readShort() * 0.1);
+                    }
+                    if (BitUtil.check(fieldMask, 2)) {
+                        position.set(Position.KEY_HUMIDITY, buf.readShort() * 0.1);
                     }
                     break;
                 case 0xF7:
