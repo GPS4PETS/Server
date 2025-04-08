@@ -38,15 +38,15 @@ public class OsmAndProtocolEncoder extends StringProtocolEncoder {
         super(protocol);
     }
 
-    private Object formatCommand(Date time, String uniqueId, String key, String value) {
-
+    private Object formatCommand(Command command, Date time, String key, String value) {
         StringBuilder result = new StringBuilder(
-            String.format("{\"topic\":\"/sys/orrcfhwg/$s/thing/service/property/set\",\"qos\":1,\"clientid\":$s,\"payload\":\"{\"version\":\"1.0\",\"params\":{\"$a\":$s},\"method\":\"thing.service.property.set\"}\"}", uniqueId, uniqueId, key, value));
+            String.format("{\"topic\":\"/sys/orrcfhwg/$s/thing/service/property/set\",\"qos\":1,\"clientid\":$s,\"payload\":\"{\"version\":\"1.0\",\"params\":{\"$a\":$s},\"method\":\"thing.service.property.set\"}\"}", getUniqueId(command.getDeviceId()), getUniqueId(command.getDeviceId()), key, value));
 
-        String command = "/usr/bin/curl -u e32bffef9d42278f:gs9Cb9A9Cv4AdPE0iioRdj41MgAVosV5tT3VM7OkO0x6wF -X POST -H 'Content-Type: application/json' -d ";
-        command += result;
-        command += " https:/emqx.gps4pets.de/api/v5/publish";
+        String cmd = "/usr/bin/curl -u e32bffef9d42278f:gs9Cb9A9Cv4AdPE0iioRdj41MgAVosV5tT3VM7OkO0x6wF -X POST -H 'Content-Type: application/json' -d ";
+        cmd += result.toString();
+        cmd += " https:/emqx.gps4pets.de/api/v5/publish";
 
+        /*
         try {
             HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI("https:/emqx.gps4pets.de/api/v5/publish"))
@@ -60,21 +60,19 @@ public class OsmAndProtocolEncoder extends StringProtocolEncoder {
         } catch (URISyntaxException | IOException | InterruptedException e) {
             e.printStackTrace();
         }
+        */
 
-        return result.toString();
+        return command;
     }
 
     protected Object encodeCommand(Command command, Date time) {
-        String uniqueId = getUniqueId(command.getDeviceId());
-        String frequency = "120";
-
         return switch (command.getType()) {
             case Command.TYPE_POSITION_PERIODIC -> {
-                frequency = command.getAttributes().get(Command.KEY_FREQUENCY).toString();
-                yield formatCommand(time, uniqueId, "gps_upTime", frequency);
+                String frequency = command.getAttributes().get(Command.KEY_FREQUENCY).toString();
+                yield formatCommand(command, time, "gps_upTime", frequency);
             }
-            case Command.TYPE_LIVEMODE_ON -> formatCommand(time, uniqueId, "LOSTMode", "1");
-            case Command.TYPE_LIVEMODE_OFF -> formatCommand(time, uniqueId, "LOSTMode", "0");
+            case Command.TYPE_LIVEMODE_ON -> formatCommand(command, time, "LOSTMode", "1");
+            case Command.TYPE_LIVEMODE_OFF -> formatCommand(command, time, "LOSTMode", "0");
             default -> null;
         };
     }

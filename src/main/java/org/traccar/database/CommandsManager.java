@@ -43,8 +43,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Singleton
 public class CommandsManager implements BroadcastInterface {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommandsManager.class);
 
     private final Storage storage;
     private final ServerManager serverManager;
@@ -95,7 +100,15 @@ public class CommandsManager implements BroadcastInterface {
                 broadcastService.updateCommand(true, deviceId);
                 return queuedCommand;
             } else {
-                throw new RuntimeException("Failed to send command");
+                Device device = storage.getObject(Device.class, new Request(
+                    new Columns.Include("model","uniqueId"), new Condition.Equals("id", deviceId)));
+                    
+                if (!device.getModel().equals("OMNI")) {
+                    throw new RuntimeException("Failed to send command to ID: " + device.getUniqueId());
+                } else {
+                    LOGGER.warn("Send to OMNI Tracker: {}", device.getUniqueId());
+                    throw new RuntimeException("Send to OMNI Tracker: " + device.getUniqueId());
+                }
             }
         }
         return null;
