@@ -46,6 +46,14 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+
 @Singleton
 public class CommandsManager implements BroadcastInterface {
 
@@ -106,8 +114,41 @@ public class CommandsManager implements BroadcastInterface {
                 if (!device.getModel().equals("OMNI")) {
                     throw new RuntimeException("Failed to send command to ID: " + device.getUniqueId());
                 } else {
-                    LOGGER.warn("Send to OMNI Tracker: {}", device.getUniqueId());
-                    throw new RuntimeException("Send to OMNI Tracker: " + device.getUniqueId());
+                    String key = "";
+                    String value = "";
+                    if (command.getType().equals("liveModeOn")) {
+                        key = "LOSTMode";
+                        value = "1";
+                    } else if (command.getType().equals("liveModeOff")) {
+                        key = "LOSTMode";
+                        value = "0";
+                    } else if (command.getType() == "positionPeriodic") {
+                        key = "gps_upTime";
+                        value = "120";
+                    }   
+
+                    String result = "{\"topic\":\"/sys/orrcfhwg/" + device.getUniqueId() + 
+                        "/thing/service/property/set\",\"qos\":1,\"clientid\":\"" + 
+                        device.getUniqueId() + ",\"payload\":\"{\"version\":\"1.0\",\"params\":{\"" + key + "\":\"" + value + 
+                        "\"},\"method\":\"thing.service.property.set\"}\"}";
+
+                    try {
+                        HttpRequest request = HttpRequest.newBuilder()
+                            .uri(new URI("https://emqx.gps4pets.de/api/v5/publish"))
+                            .header("Authorization", "e32bffef9d42278f:gs9Cb9A9Cv4AdPE0iioRdj41MgAVosV5tT3VM7OkO0x6wF")
+                            .header("Content-Type", "application/json")
+                            .POST(HttpRequest.BodyPublishers.ofString(result))
+                            .build();
+                        HttpClient http = HttpClient.newHttpClient();
+                        HttpResponse<String> response = http.send(request,BodyHandlers.ofString());
+                        System.out.println(response.body());      
+                        throw new RuntimeException("Send to OMNI Tracker OK: " + response.statusCode() + " JSON " + result);     
+                    } catch (URISyntaxException | IOException | InterruptedException e) {
+                        throw new RuntimeException("Send to OMNI Tracker ERROR: " + device.getUniqueId() + " CMDType: " + 
+                            command.getType() + " JSON: " + result);
+                    }
+                    //throw new RuntimeException("Send to OMNI Tracker: " + device.getUniqueId() + " CMDType: " + 
+                    //  command.getType() + " cmd: " + result);
                 }
             }
         }

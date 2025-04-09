@@ -30,9 +30,14 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Date;
 
 public class OsmAndProtocolEncoder extends StringProtocolEncoder {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(OsmAndProtocolEncoder.class);
 
     public OsmAndProtocolEncoder(Protocol protocol) {
         super(protocol);
@@ -44,9 +49,8 @@ public class OsmAndProtocolEncoder extends StringProtocolEncoder {
 
         String cmd = "/usr/bin/curl -u e32bffef9d42278f:gs9Cb9A9Cv4AdPE0iioRdj41MgAVosV5tT3VM7OkO0x6wF -X POST -H 'Content-Type: application/json' -d ";
         cmd += result.toString();
-        cmd += " https:/emqx.gps4pets.de/api/v5/publish";
+        cmd += " https://emqx.gps4pets.de/api/v5/publish";
 
-        /*
         try {
             HttpRequest request = HttpRequest.newBuilder()
                 .uri(new URI("https:/emqx.gps4pets.de/api/v5/publish"))
@@ -60,9 +64,7 @@ public class OsmAndProtocolEncoder extends StringProtocolEncoder {
         } catch (URISyntaxException | IOException | InterruptedException e) {
             e.printStackTrace();
         }
-        */
-
-        return command;
+        return cmd;
     }
 
     protected Object encodeCommand(Command command, Date time) {
