@@ -129,8 +129,8 @@ public class CommandsManager implements BroadcastInterface {
 
                     String result = "{\"topic\":\"/sys/orrcfhwg/" + device.getUniqueId() + 
                         "/thing/service/property/set\",\"qos\":1,\"clientid\":\"" + 
-                        device.getUniqueId() + "\",\"payload\":\"{\"version\":\"1.0\",\"params\":{\"" + key + "\":\"" + value + 
-                        "\"},\"method\":\"thing.service.property.set\"}\"}";
+                        device.getUniqueId() + "\",\"payload\":\"{\"version\":\"1.0\",\"params\":{\"" + key + "\":" + value + 
+                        "},\"method\":\"thing.service.property.set\"}\"}";
 
                     HttpResponse<String> response;
                     String username = "e32bffef9d42278f";
@@ -150,7 +150,7 @@ public class CommandsManager implements BroadcastInterface {
                         throw new RuntimeException("Send to OMNI Tracker ERROR: " + device.getUniqueId() + " CMDType: " + 
                             command.getType() + " JSON: " + result);
                     }
-                    throw new RuntimeException("Send to OMNI Tracker OK: " + response.statusCode() + " JSON " + result);     
+                    throw new RuntimeException("Send to OMNI Tracker OK: " + response.statusCode() + " body " + response.body() + " JSON " + result);     
                 }
             }
         }
