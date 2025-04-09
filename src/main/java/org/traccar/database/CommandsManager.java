@@ -129,26 +129,28 @@ public class CommandsManager implements BroadcastInterface {
 
                     String result = "{\"topic\":\"/sys/orrcfhwg/" + device.getUniqueId() + 
                         "/thing/service/property/set\",\"qos\":1,\"clientid\":\"" + 
-                        device.getUniqueId() + ",\"payload\":\"{\"version\":\"1.0\",\"params\":{\"" + key + "\":\"" + value + 
+                        device.getUniqueId() + "\",\"payload\":\"{\"version\":\"1.0\",\"params\":{\"" + key + "\":\"" + value + 
                         "\"},\"method\":\"thing.service.property.set\"}\"}";
+
+                    HttpResponse<String> response;
+                    String username = "e32bffef9d42278f";
+                    String password = "gs9Cb9A9Cv4AdPE0iioRdj41MgAVosV5tT3VM7OkO0x6wF";
 
                     try {
                         HttpRequest request = HttpRequest.newBuilder()
                             .uri(new URI("https://emqx.gps4pets.de/api/v5/publish"))
-                            .header("Authorization", "e32bffef9d42278f:gs9Cb9A9Cv4AdPE0iioRdj41MgAVosV5tT3VM7OkO0x6wF")
+                            .header("Authorization", username + ":" + password)
                             .header("Content-Type", "application/json")
                             .POST(HttpRequest.BodyPublishers.ofString(result))
                             .build();
                         HttpClient http = HttpClient.newHttpClient();
-                        HttpResponse<String> response = http.send(request,BodyHandlers.ofString());
+                        response = http.send(request,BodyHandlers.ofString());
                         System.out.println(response.body());      
-                        throw new RuntimeException("Send to OMNI Tracker OK: " + response.statusCode() + " JSON " + result);     
                     } catch (URISyntaxException | IOException | InterruptedException e) {
                         throw new RuntimeException("Send to OMNI Tracker ERROR: " + device.getUniqueId() + " CMDType: " + 
                             command.getType() + " JSON: " + result);
                     }
-                    //throw new RuntimeException("Send to OMNI Tracker: " + device.getUniqueId() + " CMDType: " + 
-                    //  command.getType() + " cmd: " + result);
+                    throw new RuntimeException("Send to OMNI Tracker OK: " + response.statusCode() + " JSON " + result);     
                 }
             }
         }
