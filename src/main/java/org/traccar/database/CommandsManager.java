@@ -46,18 +46,24 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
+import org.traccar.config.Config;
+import org.traccar.config.Keys;
+
+import java.util.UUID;
+import com.hivemq.client.mqtt.datatypes.MqttQos;
+import com.hivemq.client.mqtt.mqtt5.Mqtt5BlockingClient;
+import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
+import com.hivemq.client.mqtt.mqtt5.Mqtt5Client;
+import com.hivemq.client.mqtt.mqtt5.Mqtt5ClientBuilder;
+import com.hivemq.client.mqtt.mqtt5.message.auth.Mqtt5SimpleAuth;
+import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishResult;
 
 @Singleton
 public class CommandsManager implements BroadcastInterface {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandsManager.class);
+    @Inject
+    private Config config;
 
     private final Storage storage;
     private final ServerManager serverManager;
@@ -127,30 +133,29 @@ public class CommandsManager implements BroadcastInterface {
                         value = "120";
                     }   
 
-                    String result = "{\"topic\":\"/sys/orrcfhwg/" + device.getUniqueId() + 
-                        "/thing/service/property/set\",\"qos\":1,\"clientid\":\"" + 
-                        device.getUniqueId() + "\",\"payload\":\"{\"version\":\"1.0\",\"params\":{\"" + key + "\":" + value + 
-                        "},\"method\":\"thing.service.property.set\"}\"}";
+                    String host = config.getString(Keys.MQTT_HOST);
+                    Integer port = config.getInteger(Keys.MQTT_PORT);
+                    String username = config.getString(Keys.MQTT_USER);
+                    String password = config.getString(Keys.MQTT_PASSWORD);
 
-                    HttpResponse<String> response;
-                    String username = "e32bffef9d42278f";
-                    String password = "gs9Cb9A9Cv4AdPE0iioRdj41MgAVosV5tT3VM7OkO0x6wF";
+                    String topic = "/sys/orrcfhwg/" + device.getUniqueId() + "/thing/service/property/set";
+                    String payload = "{\"version\":\"1.0\",\"params\":{\"" + 
+                        key + "\":" + value + "},\"method\":\"thing.service.property.set\"}";
 
-                    try {
-                        HttpRequest request = HttpRequest.newBuilder()
-                            .uri(new URI("https://emqx.gps4pets.de/api/v5/publish"))
-                            .header("Authorization", username + ":" + password)
-                            .header("Content-Type", "application/json")
-                            .POST(HttpRequest.BodyPublishers.ofString(result))
-                            .build();
-                        HttpClient http = HttpClient.newHttpClient();
-                        response = http.send(request,BodyHandlers.ofString());
-                        System.out.println(response.body());      
-                    } catch (URISyntaxException | IOException | InterruptedException e) {
-                        throw new RuntimeException("Send to OMNI Tracker ERROR: " + device.getUniqueId() + " CMDType: " + 
-                            command.getType() + " JSON: " + result);
-                    }
-                    throw new RuntimeException("Send to OMNI Tracker OK: " + response.statusCode() + " body " + response.body() + " JSON " + result);     
+                    Mqtt5SimpleAuth simpleAuth = Mqtt5SimpleAuth.builder().username(username)
+                        .password(password.getBytes()).build();
+
+                    Mqtt5AsyncClient client = Mqtt5Client.builder()
+                        .identifier(UUID.randomUUID().toString())
+                        .serverHost(host)
+                        .simpleAuth(simpleAuth)
+                        .buildAsync();
+
+                    client.connect()
+                        .thenCompose(connAck -> client.publishWith().topic(topic).payload(payload.getBytes()).send())
+                        .thenCompose(publishResult -> client.disconnect());
+                    
+                    LOGGER.info("MQTT SEND: TOPIC: {} JSON: {}", topic, payload);
                 }
             }
         }

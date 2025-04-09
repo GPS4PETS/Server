@@ -31,7 +31,7 @@ public class MqttClient {
 
     private final Mqtt5AsyncClient client;
 
-    MqttClient(String url) {
+    public MqttClient(String url) {
         URI uri;
         try {
             uri = new URI(url);

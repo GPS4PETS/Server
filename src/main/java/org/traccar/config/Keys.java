@@ -2010,4 +2010,31 @@ public final class Keys {
             "broadcast.secondary",
             List.of(KeyType.CONFIG));
 
+    /**
+     * MQTT Host.
+     */
+    public static final ConfigKey<String> MQTT_HOST = new StringConfigKey(
+            "mqtt.host",
+            List.of(KeyType.CONFIG));
+
+    /**
+     * MQTT Port.
+     */
+    public static final ConfigKey<Integer> MQTT_PORT = new IntegerConfigKey(
+            "mqtt.port",
+            List.of(KeyType.CONFIG));
+   
+    /**
+     * MQTT Username.
+     */
+    public static final ConfigKey<String> MQTT_USER = new StringConfigKey(
+            "mqtt.user",
+            List.of(KeyType.CONFIG));
+
+    /**
+     * MQTT Password.
+     */
+    public static final ConfigKey<String> MQTT_PASSWORD = new StringConfigKey(
+            "mqtt.password",
+            List.of(KeyType.CONFIG));
 }
