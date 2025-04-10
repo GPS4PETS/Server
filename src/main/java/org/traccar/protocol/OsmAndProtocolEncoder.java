@@ -18,8 +18,6 @@ package org.traccar.protocol;
 
 import org.traccar.Protocol;
 import org.traccar.StringProtocolEncoder;
-import org.traccar.config.Keys;
-import org.traccar.helper.model.AttributeUtil;
 import org.traccar.model.Command;
 
 import org.slf4j.Logger;
@@ -36,10 +34,10 @@ public class OsmAndProtocolEncoder extends StringProtocolEncoder {
     }
 
     private Object formatCommand(Command command, Date time, String key, String value) {
-        String result = "{\"topic\":\"/sys/orrcfhwg/" + getUniqueId(command.getDeviceId()) + 
-            "/thing/service/property/set\",\"qos\":1,\"clientid\":\"" + 
-            getUniqueId(command.getDeviceId()) + ",\"payload\":\"{\"version\":\"1.0\",\"params\":{\"" + key + "\":\"" + value + 
-            "\"},\"method\":\"thing.service.property.set\"}\"}";
+        String result = "{\"topic\":\"/sys/orrcfhwg/" + getUniqueId(command.getDeviceId())
+            + "/thing/service/property/set\",\"qos\":1,\"clientid\":\""
+            + ngetUniqueId(command.getDeviceId()) + ",\"payload\":\"{\"version\":\"1.0\",\"params\":{\"" + key + "\":\"" + value
+            + "\"},\"method\":\"thing.service.property.set\"}\"}";
 
         return result;
     }

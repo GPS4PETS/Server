@@ -2023,7 +2023,7 @@ public final class Keys {
     public static final ConfigKey<Integer> MQTT_PORT = new IntegerConfigKey(
             "mqtt.port",
             List.of(KeyType.CONFIG));
-   
+
     /**
      * MQTT Username.
      */

@@ -50,13 +50,9 @@ import org.traccar.config.Config;
 import org.traccar.config.Keys;
 
 import java.util.UUID;
-import com.hivemq.client.mqtt.datatypes.MqttQos;
-import com.hivemq.client.mqtt.mqtt5.Mqtt5BlockingClient;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5Client;
-import com.hivemq.client.mqtt.mqtt5.Mqtt5ClientBuilder;
 import com.hivemq.client.mqtt.mqtt5.message.auth.Mqtt5SimpleAuth;
-import com.hivemq.client.mqtt.mqtt5.message.publish.Mqtt5PublishResult;
 
 @Singleton
 public class CommandsManager implements BroadcastInterface {
@@ -139,8 +135,8 @@ public class CommandsManager implements BroadcastInterface {
                     String password = config.getString(Keys.MQTT_PASSWORD);
 
                     String topic = "/sys/orrcfhwg/" + device.getUniqueId() + "/thing/service/property/set";
-                    String payload = "{\"version\":\"1.0\",\"params\":{\"" + 
-                        key + "\":" + value + "},\"method\":\"thing.service.property.set\"}";
+                    String payload = "{\"version\":\"1.0\",\"params\":{\""
+                        + key + "\":" + value + "},\"method\":\"thing.service.property.set\"}";
 
                     Mqtt5SimpleAuth simpleAuth = Mqtt5SimpleAuth.builder().username(username)
                         .password(password.getBytes()).build();
@@ -154,7 +150,7 @@ public class CommandsManager implements BroadcastInterface {
                     client.connect()
                         .thenCompose(connAck -> client.publishWith().topic(topic).payload(payload.getBytes()).send())
                         .thenCompose(publishResult -> client.disconnect());
-                    
+
                     LOGGER.info("MQTT SEND: TOPIC: {} JSON: {}", topic, payload);
                     deviceSession.sendCommand(command);
                 }

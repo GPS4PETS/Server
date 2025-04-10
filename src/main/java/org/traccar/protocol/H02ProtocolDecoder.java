@@ -425,7 +425,7 @@ public class H02ProtocolDecoder extends BaseProtocolDecoder {
                     } else if (i == 3) {
                         cid = Integer.parseInt(values[i].trim());
                         position.setNetwork(new Network(CellTower.from(mcc, mnc, lac, cid)));
-                    } else if (i == 4) {
+                    } else if (i == 4 && model.contains("PAJ-4G")) {
                         position.set(Position.KEY_BATTERY_LEVEL, values[i].trim());
                     }
                 }
