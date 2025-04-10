@@ -36,7 +36,7 @@ public class OsmAndProtocolEncoder extends StringProtocolEncoder {
     private Object formatCommand(Command command, Date time, String key, String value) {
         String result = "{\"topic\":\"/sys/orrcfhwg/" + getUniqueId(command.getDeviceId())
             + "/thing/service/property/set\",\"qos\":1,\"clientid\":\""
-            + ngetUniqueId(command.getDeviceId()) + ",\"payload\":\"{\"version\":\"1.0\",\"params\":{\"" + key + "\":\"" + value
+            + getUniqueId(command.getDeviceId()) + ",\"payload\":\"{\"version\":\"1.0\",\"params\":{\"" + key + "\":\"" + value
             + "\"},\"method\":\"thing.service.property.set\"}\"}";
 
         return result;
