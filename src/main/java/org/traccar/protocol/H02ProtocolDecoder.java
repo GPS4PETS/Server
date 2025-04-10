@@ -415,7 +415,7 @@ public class H02ProtocolDecoder extends BaseProtocolDecoder {
             for (int i = 0; i < values.length; i++) {
                 position.set(Position.PREFIX_IO + (i + 1), values[i].trim());
 
-                if (model != null && model.equals("PAJ-4G")) {
+                if (model != null && model.contains("PAJ")) {
                     if (i == 0) {
                         mcc = Integer.parseInt(values[i].trim());
                     } else if (i == 1) {
