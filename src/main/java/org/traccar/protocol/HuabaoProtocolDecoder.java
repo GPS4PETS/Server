@@ -679,24 +679,19 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
                     break;
                 case 0x9F:
                     if (buf.getUnsignedShort(buf.readerIndex()) > 200) {
-                        int mcc = Integer.parseInt(buf.readCharSequence(3, StandardCharsets.US_ASCII).toString());
-                        buf.readByte();
-                        int mnc = Integer.parseInt(buf.readCharSequence(2, StandardCharsets.US_ASCII).toString());
+                        String TEMP = buf.readCharSequence((endIndex - buf.readerIndex()), StandardCharsets.US_ASCII).toString();
+                        LOGGER.info("CELLS: " + TEMP);
+                        
+                        int mcc = Integer.parseInt(TEMP.split(",")[0]);
+                        int mnc = Integer.parseInt(TEMP.split(",")[1]);
+                        int lac = Integer.parseInt(TEMP.split(",")[2], 16);
+                        long cid = Long.parseLong(TEMP.split(",")[3], 16);
+                        int rssi = Integer.parseInt(TEMP.split(",")[4]);
+
                         LOGGER.info("mcc: " + mcc + ", mnc: " + mnc);
-                        while (buf.readerIndex() < (endIndex - 1)) {
-                            buf.readByte();
-                            int lac = Integer.parseInt((buf.readCharSequence(4, StandardCharsets.US_ASCII).toString()), 16);
-                            buf.readByte();
-                            long cid = Long.parseLong((buf.readCharSequence(6, StandardCharsets.US_ASCII).toString()), 16);
-                            buf.readByte();
-                            int rssi = buf.readUnsignedByte();
-                            LOGGER.info("lac: " + lac + ", cid: " + cid + ", rssi: " + rssi);
-                            network.addCellTower(CellTower.from(
-                                    mcc, mnc,
-                                    lac,
-                                    cid,
-                                    rssi));
-                        }
+                        LOGGER.info("lac: " + lac + ", cid: " + cid + ", rssi: " + rssi);
+                        network.addCellTower(CellTower.from(
+                            mcc, mnc, lac, cid, rssi));
                     } else {
                         while (buf.readerIndex() < endIndex) {
                             int extendedLength = buf.readUnsignedShort();
