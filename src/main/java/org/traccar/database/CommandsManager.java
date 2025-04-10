@@ -111,8 +111,8 @@ public class CommandsManager implements BroadcastInterface {
                 return queuedCommand;
             } else {
                 Device device = storage.getObject(Device.class, new Request(
-                    new Columns.Include("model","uniqueId"), new Condition.Equals("id", deviceId)));
-                    
+                    new Columns.Include("model", "uniqueId"), new Condition.Equals("id", deviceId)));
+
                 if (!device.getModel().equals("OMNI")) {
                     throw new RuntimeException("Failed to send command to ID: " + device.getUniqueId());
                 } else {
@@ -127,7 +127,7 @@ public class CommandsManager implements BroadcastInterface {
                     } else if (command.getType() == "positionPeriodic") {
                         key = "gps_upTime";
                         value = "120";
-                    }   
+                    }
 
                     String host = config.getString(Keys.MQTT_HOST);
                     Integer port = config.getInteger(Keys.MQTT_PORT);
