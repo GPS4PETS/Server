@@ -682,9 +682,9 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
                     break;
                 case 0x9F:
                     if (buf.getUnsignedShort(buf.readerIndex()) > 200) {
-                        String TEMP = buf.readCharSequence((endIndex - buf.readerIndex()), StandardCharsets.US_ASCII).toString();
+                        String temp = buf.readCharSequence((endIndex - buf.readerIndex()), StandardCharsets.US_ASCII).toString();
                         LOGGER.info("CELLS: " + TEMP);
-                        
+
                         int mcc = Integer.parseInt(TEMP.split(",")[0]);
                         int mnc = Integer.parseInt(TEMP.split(",")[1]);
                         int lac = Integer.parseInt(TEMP.split(",")[2], 16);
