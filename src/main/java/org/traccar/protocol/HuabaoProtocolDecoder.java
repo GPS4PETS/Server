@@ -383,6 +383,7 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
             return decodeTransparent(deviceSession, buf);
 
         } else if (type == MSG_TERMINAL_GENERAL_RESPONSE) {
+            
             buf.skipBytes(4); // time
             byte rslt;
             rslt = buf.readByte();
@@ -400,9 +401,13 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
             } else {
                 resultstr = "NOT SUPPORTED";
             }
+
+            Position position = new Position(getProtocolName());
+            position.setDeviceId(deviceSession.getDeviceId());
             position.set(Position.KEY_RESULT, resultstr);
 
             return position;
+
         } else if (type == MSG_COMMAND_RESPONSE) {
 
             Position position = new Position(getProtocolName());
