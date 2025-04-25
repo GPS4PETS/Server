@@ -84,6 +84,7 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
     public static final int MSG_TRANSPARENT = 0x8900;
     public static final int MSG_TRANSPARENT_RECV = 0x0900;
     public static final int MSG_CONFIGURATION_PARAMETERS = 0x8103;
+    public static final int MSG_COMMAND_RESPONSE = 0x0701;
 
     public static final int RESULT_SUCCESS = 0;
 
@@ -382,11 +383,6 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
             return decodeTransparent(deviceSession, buf);
 
         } else if (type == MSG_TERMINAL_GENERAL_RESPONSE) {
-            Position position = new Position(getProtocolName());
-            position.setDeviceId(deviceSession.getDeviceId());
-
-            getLastLocation(position, null);
-
             buf.skipBytes(4); // time
             byte rslt;
             rslt = buf.readByte();
@@ -407,6 +403,18 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
             position.set(Position.KEY_RESULT, resultstr);
 
             return position;
+        } else if (type == MSG_COMMAND_RESPONSE) {
+
+            Position position = new Position(getProtocolName());
+            position.setDeviceId(deviceSession.getDeviceId());
+
+            getLastLocation(position, null);
+
+            String result = buf.readCharSequence(buf.readInt(), StandardCharsets.US_ASCII).toString();
+            position.set(Position.KEY_RESULT, result);
+
+            return position;
+
         }
 
         return null;
@@ -655,6 +663,15 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
                 case 0x69:
                     position.set(Position.KEY_BATTERY, buf.readUnsignedShort() * 0.01);
                     break;
+                case 0x77:
+                    while (buf.readerIndex() < endIndex) {
+                        int tireIndex = buf.readUnsignedByte();
+                        position.set("tire" + tireIndex + "SensorId", ByteBufUtil.hexDump(buf.readSlice(3)));
+                        position.set("tire" + tireIndex + "Pressure", BitUtil.to(buf.readUnsignedShort(), 10) / 40.0);
+                        position.set("tire" + tireIndex + "Temp", buf.readUnsignedByte() - 50);
+                        position.set("tire" + tireIndex + "Status", buf.readUnsignedByte());
+                    }
+                    break;
                 case 0x80:
                     buf.readUnsignedByte(); // content
                     endIndex = buf.writerIndex() - 2;
@@ -815,6 +832,12 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
                     buf.readUnsignedByte(); // reserved
                     position.set(Position.KEY_BATTERY_LEVEL, buf.readUnsignedByte());
                     position.set(Position.KEY_BATTERY, buf.readUnsignedShort() / 100.0);
+                    break;
+                case 0xE4:
+                    if (buf.readUnsignedByte() == 0) {
+                        position.set(Position.KEY_CHARGE, true);
+                    }
+                    position.set(Position.KEY_BATTERY_LEVEL, buf.readUnsignedByte());
                     break;
                 case 0xE6:
                     while (buf.readerIndex() < endIndex) {
