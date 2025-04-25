@@ -25,7 +25,6 @@ import org.traccar.config.Config;
 import org.traccar.model.Command;
 
 import jakarta.inject.Inject;
-import org.traccar.model.Command;
 
 public class OsmAndProtocol extends BaseProtocol {
 
@@ -38,7 +37,7 @@ public class OsmAndProtocol extends BaseProtocol {
         );
         setSupportedPushCommands(
                 Command.TYPE_POSITION_SINGLE);
-                
+
         addServer(new TrackerServer(config, getName(), false) {
             @Override
             protected void addProtocolHandlers(PipelineBuilder pipeline, Config config) {

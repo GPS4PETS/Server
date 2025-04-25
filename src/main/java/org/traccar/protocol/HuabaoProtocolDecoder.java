@@ -383,7 +383,7 @@ public class HuabaoProtocolDecoder extends BaseProtocolDecoder {
             return decodeTransparent(deviceSession, buf);
 
         } else if (type == MSG_TERMINAL_GENERAL_RESPONSE) {
-            
+
             buf.skipBytes(4); // time
             byte rslt;
             rslt = buf.readByte();
