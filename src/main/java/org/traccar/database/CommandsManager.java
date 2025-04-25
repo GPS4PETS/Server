@@ -162,8 +162,8 @@ public class CommandsManager implements BroadcastInterface {
                             .thenCompose(publishResult -> client.disconnect());
 
                         LOGGER.info("MQTT SEND: TOPIC: {} JSON: {}", topic, payload);
-                        deviceSession.sendCommand(command);
-                        throw new RuntimeException("Failed to send command");
+                        //deviceSession.sendCommand(command);
+                        throw new RuntimeException("Send command ok");
                     }
                 }
             }
