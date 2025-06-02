@@ -278,9 +278,13 @@ public class OsmAndProtocolDecoder extends BaseHttpProtocolDecoder {
             }
         }
 
-        JsonObject extras = location.getJsonObject("extras");
-        if (extras.containsKey("alarm")) {
-            position.set(Position.KEY_ALARM, extras.getString("alarm"));
+        if (location.containsKey("alarm")) {
+            position.set(Position.KEY_ALARM, location.getString("alarm"));
+        } else if (location.containsKey("extras")) {
+            JsonObject extras = location.getJsonObject("extras");
+            if (extras.containsKey("alarm")) {
+                position.set(Position.KEY_ALARM, extras.getString("alarm"));
+            }
         }
 
         sendResponse(channel, HttpResponseStatus.OK);
