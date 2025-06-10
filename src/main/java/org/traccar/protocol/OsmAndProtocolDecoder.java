@@ -55,7 +55,7 @@ public class OsmAndProtocolDecoder extends BaseHttpProtocolDecoder {
         FullHttpRequest request = (FullHttpRequest) msg;
         String contentType = request.headers().get(HttpHeaderNames.CONTENT_TYPE);
         if (contentType != null && contentType.startsWith(HttpHeaderValues.APPLICATION_JSON.toString())) {
-            return decodeJson(channel, remoteAddress, request);
+            return decodeQuery(channel, remoteAddress, request); //decodeJson
         } else {
             return decodeQuery(channel, remoteAddress, request);
         }
