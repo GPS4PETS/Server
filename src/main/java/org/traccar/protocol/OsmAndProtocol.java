@@ -36,8 +36,9 @@ public class OsmAndProtocol extends BaseProtocol {
             Command.TYPE_LIVEMODE_OFF
         );
         setSupportedPushCommands(
-                Command.TYPE_POSITION_SINGLE);
-
+                Command.TYPE_POSITION_SINGLE,
+                Command.TYPE_POSITION_PERIODIC,
+                Command.TYPE_POSITION_STOP);
         addServer(new TrackerServer(config, getName(), false) {
             @Override
             protected void addProtocolHandlers(PipelineBuilder pipeline, Config config) {

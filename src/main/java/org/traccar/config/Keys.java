@@ -1212,6 +1212,13 @@ public final class Keys {
             List.of(KeyType.CONFIG));
 
     /**
+     * Firebase service account JSON for push commands.
+     */
+    public static final ConfigKey<String> COMMAND_FIREBASE_SERVICE_ACCOUNT = new StringConfigKey(
+            "command.firebase.serviceAccount",
+            List.of(KeyType.CONFIG));
+
+    /**
      * Enabled notification options. Comma-separated string is expected.
      * Example: web,mail,sms
      */
@@ -1237,7 +1244,7 @@ public final class Keys {
             List.of(KeyType.CONFIG));
 
     /**
-     * Firebase service account JSON.
+     * Firebase service account JSON for push notifications.
      */
     public static final ConfigKey<String> NOTIFICATOR_FIREBASE_SERVICE_ACCOUNT = new StringConfigKey(
             "notificator.firebase.serviceAccount",
