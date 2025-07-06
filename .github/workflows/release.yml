@@ -91,9 +91,7 @@ jobs:
       matrix:
         os: [alpine, debian, ubuntu]
         include:
-          - os: alpine
-            platforms: linux/amd64,linux/arm64
-          - platforms: linux/amd64,linux/arm64,linux/arm/v7
+          - platforms: linux/amd64,linux/arm64
     steps:
       - uses: actions/checkout@v4
         with:
