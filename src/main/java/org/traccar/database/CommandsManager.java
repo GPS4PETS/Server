@@ -45,7 +45,6 @@ import jakarta.inject.Singleton;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -192,7 +191,7 @@ public class CommandsManager implements BroadcastInterface {
                 events.put(event, null);
             }
             notificationManager.updateEvents(events);
-            return commands.stream().map(QueuedCommand::toCommand).collect(Collectors.toList());
+            return commands.stream().map(QueuedCommand::toCommand).toList();
         } catch (StorageException e) {
             throw new RuntimeException(e);
         }
