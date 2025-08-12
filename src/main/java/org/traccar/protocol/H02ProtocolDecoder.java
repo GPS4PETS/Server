@@ -303,11 +303,9 @@ public class H02ProtocolDecoder extends BaseProtocolDecoder {
 
     private static final Pattern PATTERN_SMS = new PatternBuilder()
             .text("*HQ,")
-            .number("(d{0}),")                   // device id
-            .groupBegin()
+            .number("(d+),")                     // id
             .text("SMS,")
-            .expression("(.*)")                 // response
-            .groupEnd()
+            .expression("(.+)")
             .text("#")
             .compile();
 
@@ -551,6 +549,28 @@ public class H02ProtocolDecoder extends BaseProtocolDecoder {
         getLastLocation(position, dateBuilder.getDate());
 
         processStatus(position, parser.nextLong(16, 0));
+
+        return position;
+    }
+
+    private Position decodeSms(String sentence, Channel channel, SocketAddress remoteAddress) {
+
+        Parser parser = new Parser(PATTERN_SMS, sentence);
+        if (!parser.matches()) {
+            return null;
+        }
+
+        DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, parser.next());
+        if (deviceSession == null) {
+            return null;
+        }
+
+        Position position = new Position(getProtocolName());
+        position.setDeviceId(deviceSession.getDeviceId());
+
+        getLastLocation(position, null);
+
+        position.set(Position.KEY_RESULT, parser.next());
 
         return position;
     }
