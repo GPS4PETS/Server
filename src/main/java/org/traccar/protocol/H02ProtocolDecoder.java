@@ -553,28 +553,6 @@ public class H02ProtocolDecoder extends BaseProtocolDecoder {
         return position;
     }
 
-    private Position decodeSms(String sentence, Channel channel, SocketAddress remoteAddress) {
-
-        Parser parser = new Parser(PATTERN_SMS, sentence);
-        if (!parser.matches()) {
-            return null;
-        }
-
-        DeviceSession deviceSession = getDeviceSession(channel, remoteAddress, parser.next());
-        if (deviceSession == null) {
-            return null;
-        }
-
-        Position position = new Position(getProtocolName());
-        position.setDeviceId(deviceSession.getDeviceId());
-
-        getLastLocation(position, null);
-
-        position.set(Position.KEY_RESULT, parser.next());
-
-        return position;
-    }
-
     private Position decodeVp1(String sentence, Channel channel, SocketAddress remoteAddress) {
 
         Parser parser = new Parser(PATTERN_VP1, sentence);
