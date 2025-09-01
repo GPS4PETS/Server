@@ -50,6 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.traccar.config.Config;
+import org.traccar.config.Keys;
 
 import java.util.UUID;
 import com.hivemq.client.mqtt.mqtt5.Mqtt5AsyncClient;
