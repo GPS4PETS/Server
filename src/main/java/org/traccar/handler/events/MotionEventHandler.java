@@ -72,8 +72,9 @@ public class MotionEventHandler extends BaseEventHandler {
 
             try {
                 storage.updateObject(device, new Request(
-                    new Columns.Include("motionStreak", "motionState", "motionTime", "motionDistance"),
-                    new Condition.Equals("id", device.getId())));
+                        new Columns.Include(
+                                "motionStreak", "motionState", "motionPositionId", "motionTime", "motionDistance"),
+                        new Condition.Equals("id", device.getId())));
             } catch (StorageException e) {
                 LOGGER.warn("Update device motion error", e);
             }
